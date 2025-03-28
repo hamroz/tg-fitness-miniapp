@@ -1,0 +1,28 @@
+{
+  "name": "fitness-mini-app-3",
+  "version": "1.0.0",
+  "description": "Telegram fitness bot with mini app integration",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "fitness",
+    "mini-app"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grammyjs/conversations": "^2.0.1",
+    "dotenv": "^16.4.1",
+    "grammy": "^1.20.3",
+    "mongodb": "^6.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
