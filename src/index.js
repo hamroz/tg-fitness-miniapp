@@ -50,15 +50,15 @@ async function initBot() {
 
         // Set bot commands for the menu
         await bot.api.setMyCommands([
-            { command: "start", description: "Start/restart the bot" },
-            { command: "menu", description: "Show the main menu" },
-            { command: "commands", description: "Show all available commands" },
-            { command: "workout", description: "Start a quick workout" },
-            { command: "progress", description: "View your fitness progress" },
-            { command: "subscribe", description: "View subscription options" },
-            { command: "language", description: "Change language (Изменить язык)" },
-            { command: "support", description: "Contact our support team" },
-            { command: "help", description: "Get help using the bot" }
+            { command: "start", description: "Старт (Start)" },
+            { command: "menu", description: "Меню (Menu)" },
+            { command: "commands", description: "Команды (Commands)" },
+            { command: "workout", description: "Тренировка (Workout)" },
+            { command: "progress", description: "Прогресс (Progress)" },
+            { command: "subscribe", description: "Подписка (Subscribe)" },
+            { command: "language", description: "Язык (Language)" },
+            { command: "support", description: "Поддержка (Support)" },
+            { command: "help", description: "Помощь (Help)" }
         ]);
 
         // Register command handlers

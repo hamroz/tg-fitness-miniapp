@@ -20,13 +20,13 @@
     "language": "Язык"
   },
   "navigation": {
-    "home": "Главная",
-    "exercises": "Упражнения",
-    "workouts": "Тренировки",
-    "progress": "Прогресс",
-    "profile": "Профиль",
-    "subscription": "Подписка",
-    "settings": "Настройки"
+    "home": "Главная (Home)",
+    "exercises": "Упражнения (Exercises)",
+    "workouts": "Тренировки (Workouts)",
+    "progress": "Прогресс (Progress)",
+    "profile": "Профиль (Profile)",
+    "subscription": "Подписка (Subscription)",
+    "settings": "Настройки (Settings)"
   },
   "home": {
     "welcome": "Добро пожаловать в Fitness Trainer",
