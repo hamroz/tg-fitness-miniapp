@@ -18,66 +18,69 @@ import CloseIcon from "@mui/icons-material/Close";
 import LockIcon from "@mui/icons-material/Lock";
 import { useTelegram } from "../context/TelegramContext";
 import { userApi } from "../services/api";
+import { useTranslation } from "react-i18next";
+import AppBottomNavigation from "../components/AppBottomNavigation";
 
-// Subscription tiers data
+// Subscription tiers data - we'll translate this dynamically
 const subscriptionTiers = [
   {
     id: "free",
-    name: "Free",
+    nameKey: "subscription.freePlan",
     price: 0,
     billingPeriod: "",
-    description: "Basic access to fitness tracking",
+    descriptionKey: "subscription.freePlanFeatures",
     features: [
-      { text: "Basic exercises", available: true },
-      { text: "Exercise timer", available: true },
-      { text: "Progress tracking", available: true },
-      { text: "Premium exercises", available: false },
-      { text: "Personalized workout plans", available: false },
-      { text: "Priority support", available: false },
+      { textKey: "Basic exercises", available: true },
+      { textKey: "Exercise timer", available: true },
+      { textKey: "Progress tracking", available: true },
+      { textKey: "Premium exercises", available: false },
+      { textKey: "Personalized workout plans", available: false },
+      { textKey: "Priority support", available: false },
     ],
-    buttonText: "Current Plan",
+    buttonTextKey: "subscription.currentPlan",
     color: "default",
   },
   {
     id: "premium",
-    name: "Premium",
+    nameKey: "subscription.premiumPlan",
     price: 5,
     billingPeriod: "/month",
-    description: "Full access to all features",
+    descriptionKey: "subscription.premiumPlanFeatures",
     features: [
-      { text: "Basic exercises", available: true },
-      { text: "Exercise timer", available: true },
-      { text: "Progress tracking", available: true },
-      { text: "Premium exercises", available: true },
-      { text: "Personalized workout plans", available: true },
-      { text: "Priority support", available: true },
+      { textKey: "Basic exercises", available: true },
+      { textKey: "Exercise timer", available: true },
+      { textKey: "Progress tracking", available: true },
+      { textKey: "Premium exercises", available: true },
+      { textKey: "Personalized workout plans", available: true },
+      { textKey: "Priority support", available: true },
     ],
-    buttonText: "Subscribe Now",
+    buttonTextKey: "subscription.subscribeNow",
     color: "primary",
   },
   {
     id: "individual",
-    name: "Individual",
+    nameKey: "subscription.individualPlan",
     price: 10,
     billingPeriod: "/month",
-    description: "Custom fitness plan with personal coaching",
+    descriptionKey: "subscription.individualPlanFeatures",
     features: [
-      { text: "Basic exercises", available: true },
-      { text: "Exercise timer", available: true },
-      { text: "Progress tracking", available: true },
-      { text: "Premium exercises", available: true },
-      { text: "Personalized workout plans", available: true },
-      { text: "Priority support", available: true },
-      { text: "Custom fitness plan", available: true },
-      { text: "Personal coaching", available: true },
+      { textKey: "Basic exercises", available: true },
+      { textKey: "Exercise timer", available: true },
+      { textKey: "Progress tracking", available: true },
+      { textKey: "Premium exercises", available: true },
+      { textKey: "Personalized workout plans", available: true },
+      { textKey: "Priority support", available: true },
+      { textKey: "Custom fitness plan", available: true },
+      { textKey: "Personal coaching", available: true },
     ],
-    buttonText: "Get Custom Plan",
+    buttonTextKey: "subscription.getIndividual",
     color: "secondary",
   },
 ];
 
 const SubscriptionPage = () => {
   const { webApp, user } = useTelegram();
+  const { t } = useTranslation();
   const [currentSubscription, setCurrentSubscription] = useState("free");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -91,7 +94,7 @@ const SubscriptionPage = () => {
 
       // Make main button visible and customizable
       webApp.MainButton.setParams({
-        text: "CHECKOUT",
+        text: t("subscription.subscribeNow").toUpperCase(),
         color: "#2481cc",
         text_color: "#ffffff",
         is_active: false,
@@ -105,7 +108,7 @@ const SubscriptionPage = () => {
         webApp.MainButton.hide();
       }
     };
-  }, [webApp]);
+  }, [webApp, t]);
 
   useEffect(() => {
     // Fetch user's current subscription
@@ -135,7 +138,11 @@ const SubscriptionPage = () => {
 
     if (webApp) {
       // Show the main button to proceed with payment
-      webApp.MainButton.setText(`CHECKOUT - ${tierId.toUpperCase()}`);
+      webApp.MainButton.setText(
+        `${t(
+          "subscription.subscribeNow"
+        ).toUpperCase()} - ${tierId.toUpperCase()}`
+      );
       webApp.MainButton.show();
       webApp.MainButton.onClick(() => {
         initiatePayment(tierId);
@@ -171,7 +178,7 @@ const SubscriptionPage = () => {
       }
     } catch (error) {
       console.error("Payment initiation error:", error);
-      alert("Failed to initiate payment. Please try again.");
+      alert(t("common.error"));
     }
   };
 
@@ -185,7 +192,9 @@ const SubscriptionPage = () => {
     // YooMoney integration
     // This would open a payment form or redirect to YooMoney
     alert(
-      `YooMoney payment for ${tier.name} subscription would be initiated here.`
+      `YooMoney ${t("subscription.paymentMethods")} ${t(tier.nameKey)} ${t(
+        "subscription.subscribeNow"
+      )}`
     );
 
     // In the real implementation, there would be:
@@ -203,7 +212,9 @@ const SubscriptionPage = () => {
   const initiateTelegramPayment = (tier: any) => {
     if (webApp) {
       alert(
-        `Telegram payment for ${tier.name} subscription would be initiated here.`
+        `Telegram ${t("subscription.paymentMethods")} ${t(tier.nameKey)} ${t(
+          "subscription.subscribeNow"
+        )}`
       );
 
       // In a real implementation:
@@ -215,7 +226,7 @@ const SubscriptionPage = () => {
         updateSubscription(tier.id);
       }, 2000);
     } else {
-      alert("Telegram payment is only available inside the Telegram app.");
+      alert(t("common.error"));
     }
   };
 
@@ -240,109 +251,89 @@ const SubscriptionPage = () => {
         webApp.MainButton.hide();
       }
 
-      alert(`Subscription updated to ${tierId.toUpperCase()}`);
+      alert(`${t("subscription.currentPlan")}: ${tierId.toUpperCase()}`);
     } catch (error) {
       console.error("Error updating subscription:", error);
-      alert("Failed to update subscription. Please try again.");
+      alert(t("common.error"));
     }
   };
 
+  // Add the rest of the component rendering here
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center">
-        Subscription Plans
-      </Typography>
-      <Typography
-        variant="subtitle1"
-        align="center"
-        color="text.secondary"
-        sx={{ mb: 4 }}
-      >
-        Choose the plan that best fits your fitness goals
-      </Typography>
+    <Container maxWidth="md" sx={{ py: 3, pb: 7 }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1" gutterBottom align="center">
+          {t("subscription.choosePlan")}
+        </Typography>
+      </Box>
 
-      <Grid container spacing={3} justifyContent="center">
+      <Grid container spacing={3}>
         {subscriptionTiers.map((tier) => (
-          <Grid item xs={12} sm={6} md={4} key={tier.id}>
+          <Grid item xs={12} md={4} key={tier.id}>
             <Paper
-              elevation={tier.id === currentSubscription ? 8 : 2}
               sx={{
                 p: 3,
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                height: "100%",
-                position: "relative",
-                transition: "all 0.3s ease",
                 border:
+                  tier.id === currentSubscription ? "2px solid" : "1px solid",
+                borderColor:
                   tier.id === currentSubscription
-                    ? `2px solid ${
-                        tier.color === "primary"
-                          ? "#2481cc"
-                          : tier.color === "secondary"
-                          ? "#8774e1"
-                          : "#ccc"
-                      }`
-                    : "none",
+                    ? `${tier.color}.main`
+                    : "divider",
               }}
             >
-              {tier.id === currentSubscription && (
-                <Chip
-                  label="Current Plan"
-                  color="primary"
-                  size="small"
-                  sx={{
-                    position: "absolute",
-                    top: 10,
-                    right: 10,
-                  }}
-                />
-              )}
-
-              <Typography variant="h5" component="h2" gutterBottom>
-                {tier.name}
-              </Typography>
-
               <Box sx={{ mb: 2 }}>
-                <Typography component="span" variant="h4">
-                  ${tier.price}
+                {tier.id === currentSubscription && (
+                  <Chip
+                    label={t("subscription.currentPlan")}
+                    color={tier.color as any}
+                    size="small"
+                    sx={{ mb: 1 }}
+                  />
+                )}
+                <Typography variant="h5" component="h2" gutterBottom>
+                  {t(tier.nameKey)}
                 </Typography>
+                {tier.price > 0 ? (
+                  <Typography variant="h4" color="text.primary">
+                    ${tier.price}
+                    <Typography
+                      component="span"
+                      variant="subtitle1"
+                      sx={{ verticalAlign: "baseline" }}
+                    >
+                      {tier.billingPeriod}
+                    </Typography>
+                  </Typography>
+                ) : (
+                  <Typography variant="h4" color="text.primary">
+                    {t("common.free")}
+                  </Typography>
+                )}
                 <Typography
-                  component="span"
-                  variant="subtitle1"
+                  variant="body2"
                   color="text.secondary"
+                  sx={{ mt: 1 }}
                 >
-                  {tier.billingPeriod}
+                  {t(tier.descriptionKey)}
                 </Typography>
               </Box>
 
-              <Typography color="text.secondary" sx={{ mb: 2 }}>
-                {tier.description}
-              </Typography>
-
               <Divider sx={{ my: 2 }} />
 
-              <List sx={{ flexGrow: 1, mb: 2 }}>
+              <List sx={{ mb: 2, flexGrow: 1 }}>
                 {tier.features.map((feature, idx) => (
-                  <ListItem key={idx} dense>
-                    <ListItemIcon sx={{ minWidth: 32 }}>
+                  <ListItem key={idx} disableGutters sx={{ py: 0.5 }}>
+                    <ListItemIcon sx={{ minWidth: 36 }}>
                       {feature.available ? (
-                        <CheckIcon color="success" fontSize="small" />
+                        <CheckIcon color="success" />
                       ) : (
-                        <CloseIcon color="error" fontSize="small" />
+                        <CloseIcon color="error" />
                       )}
                     </ListItemIcon>
-                    <ListItemText
-                      primary={feature.text}
-                      primaryTypographyProps={{
-                        variant: "body2",
-                        sx: !feature.available
-                          ? { color: "text.disabled" }
-                          : {},
-                      }}
-                    />
-                    {!feature.available && (
-                      <LockIcon fontSize="small" color="disabled" />
-                    )}
+                    <ListItemText primary={feature.textKey} />
                   </ListItem>
                 ))}
               </List>
@@ -352,24 +343,20 @@ const SubscriptionPage = () => {
                 variant={
                   tier.id === currentSubscription ? "outlined" : "contained"
                 }
-                color={
-                  tier.color === "primary"
-                    ? "primary"
-                    : tier.color === "secondary"
-                    ? "secondary"
-                    : "inherit"
-                }
+                color={tier.color as any}
                 onClick={() => handleSubscribe(tier.id)}
-                disabled={tier.id === currentSubscription || isLoading}
+                disabled={tier.id === currentSubscription}
               >
                 {tier.id === currentSubscription
-                  ? "Current Plan"
-                  : tier.buttonText}
+                  ? t("subscription.currentPlan")
+                  : t(tier.buttonTextKey)}
               </Button>
             </Paper>
           </Grid>
         ))}
       </Grid>
+
+      <AppBottomNavigation />
     </Container>
   );
 };

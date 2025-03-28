@@ -16,6 +16,7 @@ class NotificationScheduler {
         this.scheduleWorkoutReminders();
         this.scheduleWeeklyProgress();
         this.scheduleSubscriptionReminders();
+        this.scheduleGeneralWorkoutReminder();
 
         console.log('Notification scheduler initialized');
     }
@@ -65,6 +66,18 @@ class NotificationScheduler {
         }));
 
         console.log('Subscription reminders scheduled');
+    }
+
+    /**
+     * Schedule general workout reminder for all premium users
+     * Runs daily at 10:00 AM
+     */
+    scheduleGeneralWorkoutReminder() {
+        this.scheduledJobs.set('general-workout-reminder', cron.schedule('0 10 * * *', () => {
+            this.sendGeneralWorkoutReminder();
+        }));
+
+        console.log('General workout reminder scheduled');
     }
 
     /**
@@ -273,6 +286,44 @@ class NotificationScheduler {
             return 'дня';
         } else {
             return 'дней';
+        }
+    }
+
+    /**
+     * Send a general workout reminder to all premium users
+     */
+    async sendGeneralWorkoutReminder() {
+        try {
+            // Get all users with premium or individual subscription
+            const premiumUsers = await this.userModel.collection.find({
+                subscription: { $in: ['premium', 'individual'] }
+            }).toArray();
+
+            if (!premiumUsers || premiumUsers.length === 0) {
+                console.log('No premium users found for general workout reminder');
+                return;
+            }
+
+            console.log(`Sending general workout reminder to ${premiumUsers.length} premium users`);
+
+            // Send reminder to each premium user
+            for (const user of premiumUsers) {
+                const isRussian = user.language === 'ru';
+                const message = isRussian
+                    ? '🏋️ *Пора тренироваться!*\n\nНе забудьте выполнить тренировку сегодня. Ваш прогресс важен для нас!'
+                    : '🏋️ *Time to work out!*\n\nDon\'t forget to complete your workout today. Your progress matters to us!';
+
+                await this.bot.api.sendMessage(user.userId, message, {
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: isRussian ? 'Открыть приложение' : 'Open App', web_app: { url: process.env.MINI_APP_URL } }]
+                        ]
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error sending general workout reminder:', error);
         }
     }
 

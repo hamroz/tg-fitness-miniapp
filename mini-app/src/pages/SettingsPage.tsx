@@ -16,8 +16,8 @@ const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Container maxWidth="sm" sx={{ pb: 7 }}>
-      <Box sx={{ my: 4 }}>
+    <Container maxWidth="sm" sx={{ py: 3, pb: 7 }}>
+      <Box sx={{ mb: 3 }}>
         <Typography variant="h4" component="h1" gutterBottom align="center">
           {t("settings.title")}
         </Typography>
