@@ -11,46 +11,81 @@ import {
   InputAdornment,
   IconButton,
   Grid,
+  Paper,
+  Button,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import LockIcon from "@mui/icons-material/Lock";
 import { Exercise, ExerciseCategory, WorkoutLog } from "../types/exercise";
-import { exerciseApi } from "../services/api";
+import { exerciseApi, userApi } from "../services/api";
 import ExerciseCard from "./ExerciseCard";
 import WorkoutLogForm from "./WorkoutLogForm";
+import { useTelegram } from "../context/TelegramContext";
+import { Link } from "react-router-dom";
 
 // Define tabs for categories
-const categories: { label: string; value: ExerciseCategory | "all" }[] = [
+const categories: {
+  label: string;
+  value: ExerciseCategory | "all" | "premium";
+}[] = [
   { label: "All", value: "all" },
   { label: "Cardio", value: "cardio" },
   { label: "Strength", value: "strength" },
   { label: "Flexibility", value: "flexibility" },
   { label: "Balance", value: "balance" },
+  { label: "Premium", value: "premium" },
 ];
 
+// Premium exercise IDs - in a real app, this would come from the backend
+const premiumExerciseIds = ["2", "4", "7", "10"];
+
 const ExerciseList = () => {
+  const { user } = useTelegram();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<
-    ExerciseCategory | "all"
+    ExerciseCategory | "all" | "premium"
   >("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
     null
   );
   const [logFormOpen, setLogFormOpen] = useState(false);
+  const [userSubscription, setUserSubscription] = useState("free");
+  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
 
-  // Load exercises on component mount
+  // Load exercises and check subscription on component mount
   useEffect(() => {
     loadExercises();
-  }, []);
+    if (user?.id) {
+      checkUserSubscription();
+    }
+  }, [user]);
 
   // Filter exercises when category or search changes
   useEffect(() => {
     filterExercises();
-  }, [activeCategory, searchQuery, exercises]);
+  }, [activeCategory, searchQuery, exercises, userSubscription]);
+
+  const checkUserSubscription = async () => {
+    try {
+      if (!user?.id) return;
+
+      const userData = await userApi.getUserData(user.id.toString());
+      if (userData?.subscription) {
+        setUserSubscription(userData.subscription);
+      }
+      setSubscriptionChecked(true);
+    } catch (err) {
+      console.error("Error checking subscription:", err);
+      // Default to free if there's an error
+      setUserSubscription("free");
+      setSubscriptionChecked(true);
+    }
+  };
 
   const loadExercises = async () => {
     try {
@@ -71,7 +106,9 @@ const ExerciseList = () => {
     let filtered = [...exercises];
 
     // Filter by category
-    if (activeCategory !== "all") {
+    if (activeCategory === "premium") {
+      filtered = filtered.filter((exercise) => isPremiumExercise(exercise._id));
+    } else if (activeCategory !== "all") {
       filtered = filtered.filter(
         (exercise) => exercise.category === activeCategory
       );
@@ -94,9 +131,13 @@ const ExerciseList = () => {
     setFilteredExercises(filtered);
   };
 
+  const isPremiumExercise = (exerciseId: string): boolean => {
+    return premiumExerciseIds.includes(exerciseId);
+  };
+
   const handleCategoryChange = (
     _event: React.SyntheticEvent,
-    newValue: ExerciseCategory | "all"
+    newValue: ExerciseCategory | "all" | "premium"
   ) => {
     setActiveCategory(newValue);
   };
@@ -113,6 +154,15 @@ const ExerciseList = () => {
     exercise: Exercise,
     data: { reps?: number; sets?: number; duration?: number }
   ) => {
+    // Check if premium exercise and user has appropriate subscription
+    if (
+      isPremiumExercise(exercise._id) &&
+      userSubscription !== "premium" &&
+      userSubscription !== "individual"
+    ) {
+      return; // User doesn't have access
+    }
+
     setSelectedExercise(exercise);
     setLogFormOpen(true);
   };
@@ -122,11 +172,47 @@ const ExerciseList = () => {
     // You might want to update UI or show a success message
   };
 
+  const handleSubscribeClick = () => {
+    // Navigate to subscription page
+    window.location.href = "/subscription";
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Exercise Library
       </Typography>
+
+      {userSubscription === "free" && (
+        <Paper
+          sx={{
+            p: 2,
+            mb: 3,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box>
+            <Typography variant="subtitle1" gutterBottom>
+              Unlock Premium Exercises
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Subscribe to our Premium or Individual plan to access all
+              exercises.
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            color="secondary"
+            component={Link}
+            to="/subscription"
+            startIcon={<LockIcon />}
+          >
+            View Plans
+          </Button>
+        </Paper>
+      )}
 
       {/* Search Bar */}
       <TextField
@@ -163,7 +249,16 @@ const ExerciseList = () => {
           {categories.map((category) => (
             <Tab
               key={category.value}
-              label={category.label}
+              label={
+                category.value === "premium" ? (
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    {category.label}
+                    <LockIcon fontSize="small" sx={{ ml: 0.5 }} />
+                  </Box>
+                ) : (
+                  category.label
+                )
+              }
               value={category.value}
             />
           ))}
@@ -190,6 +285,8 @@ const ExerciseList = () => {
               <ExerciseCard
                 exercise={exercise}
                 onLogWorkout={handleLogWorkout}
+                isPremium={isPremiumExercise(exercise._id)}
+                userSubscription={userSubscription}
               />
             </Grid>
           ))}

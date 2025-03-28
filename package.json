@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:admin": "node src/test/test-admin-features.js"
   },
   "keywords": [
     "telegram",
@@ -18,9 +19,11 @@
   "license": "ISC",
   "dependencies": {
     "@grammyjs/conversations": "^2.0.1",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.1",
     "grammy": "^1.20.3",
-    "mongodb": "^6.3.0"
+    "mongodb": "^6.3.0",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

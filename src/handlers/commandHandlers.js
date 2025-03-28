@@ -90,6 +90,22 @@ function supportHandler(userModel) {
 }
 
 /**
+ * Handler for /cancel command
+ * Used to cancel ongoing operations
+ */
+function cancelHandler() {
+    return async (ctx) => {
+        const language = ctx.from.language_code === 'ru' ? 'ru' : 'en';
+
+        const cancelText = language === 'en'
+            ? 'Current operation has been cancelled.'
+            : 'Текущая операция была отменена.';
+
+        await ctx.reply(cancelText);
+    };
+}
+
+/**
  * Handler for inline button that opens the mini app
  */
 function openAppHandler() {
@@ -104,5 +120,6 @@ module.exports = {
     helpHandler,
     subscribeHandler,
     supportHandler,
+    cancelHandler,
     openAppHandler
 }; 

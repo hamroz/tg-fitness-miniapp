@@ -1,24 +1,18 @@
 require('dotenv').config();
-const { Bot, session, GrammyError, HttpError } = require('grammy');
+const { session, GrammyError, HttpError } = require('grammy');
 const { conversations, createConversation } = require('@grammyjs/conversations');
 const { connectToDatabase, closeConnection } = require('./config/database');
 const User = require('./models/User');
+const bot = require('./bot'); // Import the bot instance
+const { adminUtils, NotificationScheduler } = require('./utils');
+const SupportHandler = require('./handlers/supportHandler');
 const {
     startHandler,
     helpHandler,
     subscribeHandler,
-    supportHandler,
     openAppHandler
 } = require('./handlers/commandHandlers');
 const onboardingConversation = require('./handlers/onboardingConversation');
-
-// Check if bot token is provided
-if (!process.env.BOT_TOKEN) {
-    throw new Error('BOT_TOKEN not provided in .env file');
-}
-
-// Create bot instance
-const bot = new Bot(process.env.BOT_TOKEN);
 
 // Set up sessions and conversations middleware
 bot.use(session({ initial: () => ({}) }));
@@ -34,16 +28,38 @@ async function initBot() {
         // Initialize user model
         const userModel = new User(db);
 
+        // Initialize notification scheduler
+        const scheduler = new NotificationScheduler(bot, db);
+        scheduler.initializeScheduler();
+
+        // Initialize support handler
+        const supportHandler = new SupportHandler(bot);
+        supportHandler.init();
+
         // Register the onboarding conversation
         bot.use(createConversation(
             (conversation, ctx) => onboardingConversation(conversation, ctx, userModel)
             , 'onboardingConversation'));
 
         // Register command handlers
-        bot.command('start', startHandler(userModel));
+        bot.command('start', async (ctx) => {
+            const handler = startHandler(userModel);
+            await handler(ctx);
+
+            // Report new user registration to admin group
+            const user = await userModel.getUserById(ctx.from.id);
+            if (user) {
+                adminUtils.reportNewUser(user).catch(console.error);
+            }
+        });
+
         bot.command('help', helpHandler(userModel));
         bot.command('subscribe', subscribeHandler(userModel));
-        bot.command('support', supportHandler(userModel));
+
+        // Cancel command for exiting support mode
+        bot.command('cancel', async (ctx) => {
+            await supportHandler.handleCancelCommand(ctx);
+        });
 
         // Register callback query handlers
         bot.callbackQuery('open_app', openAppHandler());
@@ -68,6 +84,7 @@ async function initBot() {
         // Handle shutdown
         process.once('SIGINT', async () => {
             console.log('Stopping bot...');
+            scheduler.stopAll();
             await bot.stop();
             await closeConnection();
             process.exit(0);
@@ -75,6 +92,7 @@ async function initBot() {
 
         process.once('SIGTERM', async () => {
             console.log('Stopping bot...');
+            scheduler.stopAll();
             await bot.stop();
             await closeConnection();
             process.exit(0);

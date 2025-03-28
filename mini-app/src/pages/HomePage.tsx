@@ -6,20 +6,22 @@ import {
   Paper,
   Button,
   Stack,
+  Chip,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useTelegram } from "../context/TelegramContext";
+import { userApi } from "../services/api";
 
 const HomePage = () => {
   const { user, webApp } = useTelegram();
   const [hasPhoneNumber, setHasPhoneNumber] = useState(false);
+  const [userSubscription, setUserSubscription] = useState("free");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, check if user has phone number
-    // For now, we'll just simulate it
     if (user) {
-      // This would be an API call in a real app
-      setHasPhoneNumber(false);
+      // Fetch user data and check for phone number and subscription
+      fetchUserData();
     }
   }, [user]);
 
@@ -29,6 +31,41 @@ const HomePage = () => {
       webApp.BackButton.hide();
     }
   }, [webApp]);
+
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true);
+      if (user?.id) {
+        const userData = await userApi.getUserData(user.id.toString());
+
+        // Check if user has phone number
+        setHasPhoneNumber(!!userData?.phone);
+
+        // Check subscription type
+        if (userData?.subscription) {
+          setUserSubscription(userData.subscription);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Get subscription display name and color
+  const getSubscriptionInfo = () => {
+    switch (userSubscription) {
+      case "premium":
+        return { name: "Premium", color: "primary" };
+      case "individual":
+        return { name: "Individual", color: "secondary" };
+      default:
+        return { name: "Free", color: "default" };
+    }
+  };
+
+  const subscriptionInfo = getSubscriptionInfo();
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
@@ -42,8 +79,21 @@ const HomePage = () => {
           backgroundPosition: "center",
           color: "white",
           mb: 4,
+          position: "relative",
         }}
       >
+        {!isLoading && (
+          <Chip
+            label={`${subscriptionInfo.name} Plan`}
+            color={subscriptionInfo.color as any}
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+            }}
+          />
+        )}
         <Typography variant="h4" component="h1" gutterBottom>
           Fitness Trainer
         </Typography>
@@ -119,6 +169,45 @@ const HomePage = () => {
               sx={{ mt: 1 }}
             >
               View Progress
+            </Button>
+          </Box>
+        </Paper>
+
+        <Paper
+          sx={{
+            p: 3,
+            backgroundColor:
+              userSubscription === "free"
+                ? "secondary.light"
+                : "background.paper",
+            color:
+              userSubscription === "free"
+                ? "secondary.contrastText"
+                : "text.primary",
+          }}
+        >
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              {userSubscription === "free"
+                ? "Upgrade Your Plan"
+                : "Subscription"}
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              {userSubscription === "free"
+                ? "Get access to premium exercises and personalized plans."
+                : `You are on the ${subscriptionInfo.name} plan. Manage your subscription.`}
+            </Typography>
+            <Button
+              variant="contained"
+              color="secondary"
+              component={Link}
+              to="/subscription"
+              fullWidth
+              sx={{ mt: 1 }}
+            >
+              {userSubscription === "free"
+                ? "View Plans"
+                : "Manage Subscription"}
             </Button>
           </Box>
         </Paper>

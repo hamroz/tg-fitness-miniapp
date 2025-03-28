@@ -40,6 +40,12 @@ export const exerciseApi = {
     const response = await api.get<Exercise>(`/exercises/${id}`);
     return response.data;
   },
+
+  // Get premium exercises (for subscribers only)
+  getPremiumExercises: async () => {
+    const response = await api.get<Exercise[]>("/exercises/premium");
+    return response.data;
+  },
 };
 
 export const workoutApi = {
@@ -88,6 +94,59 @@ export const userApi = {
   // Get user data
   getUserData: async (userId: string) => {
     const response = await api.get(`/users/${userId}`);
+    return response.data;
+  },
+
+  // Update user subscription
+  updateSubscription: async (
+    userId: string,
+    subscription: string,
+    expiryDate: string
+  ) => {
+    const response = await api.put(`/users/${userId}/subscription`, {
+      subscription,
+      expiryDate,
+    });
+    return response.data;
+  },
+
+  // Submit information for Individual plan
+  submitIndividualPlanInfo: async (
+    userId: string,
+    data: {
+      goals: string;
+      weight: number;
+      height: number;
+      fitnessLevel: string;
+      healthIssues?: string;
+      preferredWorkoutDays: string[];
+      preferredWorkoutTime: string;
+    }
+  ) => {
+    const response = await api.post(`/users/${userId}/individual-plan`, data);
+    return response.data;
+  },
+
+  // Check subscription status
+  checkSubscriptionStatus: async (userId: string) => {
+    const response = await api.get(`/users/${userId}/subscription-status`);
+    return response.data;
+  },
+
+  // Process payment
+  processPayment: async (
+    userId: string,
+    paymentData: {
+      subscriptionId: string;
+      amount: number;
+      paymentMethod: "telegram" | "yoomoney";
+      currency: string;
+    }
+  ) => {
+    const response = await api.post(`/payments/process`, {
+      userId,
+      ...paymentData,
+    });
     return response.data;
   },
 };

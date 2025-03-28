@@ -9,7 +9,9 @@ import {
   Box,
   Collapse,
   Stack,
+  Tooltip,
 } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
 import { Exercise } from "../types/exercise";
 import ExerciseTimer from "./ExerciseTimer";
 
@@ -19,9 +21,16 @@ interface ExerciseCardProps {
     exercise: Exercise,
     data: { reps?: number; sets?: number; duration?: number }
   ) => void;
+  isPremium?: boolean;
+  userSubscription?: string;
 }
 
-const ExerciseCard = ({ exercise, onLogWorkout }: ExerciseCardProps) => {
+const ExerciseCard = ({
+  exercise,
+  onLogWorkout,
+  isPremium = false,
+  userSubscription = "free",
+}: ExerciseCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [completed, setCompleted] = useState(false);
@@ -42,15 +51,81 @@ const ExerciseCard = ({ exercise, onLogWorkout }: ExerciseCardProps) => {
   const placeholderImage =
     "https://via.placeholder.com/300x200?text=Exercise+Image";
 
+  // Check if user has access to this exercise
+  const hasAccess =
+    !isPremium ||
+    userSubscription === "premium" ||
+    userSubscription === "individual";
+
+  // Apply blur effect for premium exercises that user doesn't have access to
+  const blurStyle = !hasAccess
+    ? {
+        filter: "blur(5px)",
+        opacity: 0.7,
+        pointerEvents: "none" as const,
+      }
+    : {};
+
   return (
-    <Card sx={{ maxWidth: "100%", mb: 2 }}>
+    <Card sx={{ maxWidth: "100%", mb: 2, position: "relative" }}>
+      {isPremium && (
+        <Chip
+          label="Premium"
+          color="secondary"
+          size="small"
+          sx={{
+            position: "absolute",
+            top: 10,
+            right: 10,
+            zIndex: 2,
+          }}
+        />
+      )}
+
+      {isPremium && !hasAccess && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(0,0,0,0.4)",
+            zIndex: 1,
+            p: 3,
+            textAlign: "center",
+          }}
+        >
+          <LockIcon sx={{ fontSize: 48, color: "white", mb: 2 }} />
+          <Typography color="white" variant="h6" gutterBottom>
+            Premium Exercise
+          </Typography>
+          <Typography color="white" variant="body2" sx={{ mb: 2 }}>
+            Subscribe to our Premium or Individual plan to access this exercise
+          </Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            component="a"
+            href="/subscription"
+          >
+            View Subscription Plans
+          </Button>
+        </Box>
+      )}
+
       <CardMedia
         component="img"
         height="200"
         image={exercise.imageUrl || placeholderImage}
         alt={exercise.name}
+        sx={blurStyle}
       />
-      <CardContent>
+      <CardContent sx={blurStyle}>
         <Typography gutterBottom variant="h5" component="div">
           {exercise.name}
         </Typography>
