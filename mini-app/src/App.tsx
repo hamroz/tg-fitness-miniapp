@@ -6,6 +6,7 @@ import ExercisePage from "./pages/ExercisePage";
 import ProgressPage from "./pages/ProgressPage";
 import ProfilePage from "./pages/ProfilePage";
 import SubscriptionPage from "./pages/SubscriptionPage";
+import SettingsPage from "./pages/SettingsPage";
 
 // Create a theme instance based on Telegram's theme
 const theme = createTheme({
@@ -64,6 +65,7 @@ function App() {
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/subscription" element={<SubscriptionPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </Router>
       </TelegramProvider>

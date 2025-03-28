@@ -11,9 +11,12 @@ import {
 import { Link } from "react-router-dom";
 import { useTelegram } from "../context/TelegramContext";
 import { userApi } from "../services/api";
+import { useTranslation } from "react-i18next";
+import AppBottomNavigation from "../components/AppBottomNavigation";
 
 const HomePage = () => {
   const { user, webApp } = useTelegram();
+  const { t } = useTranslation();
   const [hasPhoneNumber, setHasPhoneNumber] = useState(false);
   const [userSubscription, setUserSubscription] = useState("free");
   const [isLoading, setIsLoading] = useState(true);
@@ -57,18 +60,18 @@ const HomePage = () => {
   const getSubscriptionInfo = () => {
     switch (userSubscription) {
       case "premium":
-        return { name: "Premium", color: "primary" };
+        return { name: t("subscription.premiumPlan"), color: "primary" };
       case "individual":
-        return { name: "Individual", color: "secondary" };
+        return { name: t("subscription.individualPlan"), color: "secondary" };
       default:
-        return { name: "Free", color: "default" };
+        return { name: t("subscription.freePlan"), color: "default" };
     }
   };
 
   const subscriptionInfo = getSubscriptionInfo();
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
+    <Container maxWidth="sm" sx={{ py: 4, pb: 7 }}>
       <Paper
         sx={{
           p: 3,
@@ -84,7 +87,7 @@ const HomePage = () => {
       >
         {!isLoading && (
           <Chip
-            label={`${subscriptionInfo.name} Plan`}
+            label={`${subscriptionInfo.name} ${t("subscription.currentPlan")}`}
             color={subscriptionInfo.color as any}
             size="small"
             sx={{
@@ -99,8 +102,8 @@ const HomePage = () => {
         </Typography>
         <Typography variant="subtitle1">
           {user
-            ? `Welcome, ${user.firstName}!`
-            : "Welcome to your personal fitness assistant!"}
+            ? `${t("home.welcome")}, ${user.firstName}!`
+            : t("home.welcome")}
         </Typography>
       </Paper>
 
@@ -114,10 +117,10 @@ const HomePage = () => {
             }}
           >
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Complete Your Profile
+              {t("profile.personalInfo")}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }}>
-              Please add your phone number to continue.
+              {t("profile.phone")}
             </Typography>
             <Button
               variant="contained"
@@ -126,7 +129,7 @@ const HomePage = () => {
               to="/profile"
               fullWidth
             >
-              Add Phone Number
+              {t("profile.personalInfo")}
             </Button>
           </Paper>
         )}
@@ -134,10 +137,10 @@ const HomePage = () => {
         <Paper sx={{ p: 3 }}>
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Exercise Library
+              {t("navigation.exercises")}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              Browse our collection of exercises for all fitness levels.
+              {t("exercises.searchPlaceholder")}
             </Typography>
             <Button
               variant="contained"
@@ -147,7 +150,7 @@ const HomePage = () => {
               fullWidth
               sx={{ mt: 1 }}
             >
-              View Exercises
+              {t("navigation.exercises")}
             </Button>
           </Box>
         </Paper>
@@ -155,10 +158,10 @@ const HomePage = () => {
         <Paper sx={{ p: 3 }}>
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Track Progress
+              {t("navigation.progress")}
             </Typography>
             <Typography variant="body2" gutterBottom>
-              View your workout history and progress.
+              {t("home.recentWorkouts")}
             </Typography>
             <Button
               variant="contained"
@@ -168,7 +171,7 @@ const HomePage = () => {
               fullWidth
               sx={{ mt: 1 }}
             >
-              View Progress
+              {t("navigation.progress")}
             </Button>
           </Box>
         </Paper>
@@ -189,13 +192,13 @@ const HomePage = () => {
           <Box sx={{ mb: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               {userSubscription === "free"
-                ? "Upgrade Your Plan"
-                : "Subscription"}
+                ? t("subscription.upgradeNow")
+                : t("subscription.yourPlan")}
             </Typography>
             <Typography variant="body2" gutterBottom>
               {userSubscription === "free"
-                ? "Get access to premium exercises and personalized plans."
-                : `You are on the ${subscriptionInfo.name} plan. Manage your subscription.`}
+                ? t("subscription.premiumFeatures")
+                : `${t("subscription.currentPlan")}: ${subscriptionInfo.name}`}
             </Typography>
             <Button
               variant="contained"
@@ -206,12 +209,14 @@ const HomePage = () => {
               sx={{ mt: 1 }}
             >
               {userSubscription === "free"
-                ? "View Plans"
-                : "Manage Subscription"}
+                ? t("subscription.choosePlan")
+                : t("subscription.changePlan")}
             </Button>
           </Box>
         </Paper>
       </Stack>
+
+      <AppBottomNavigation />
     </Container>
   );
 };

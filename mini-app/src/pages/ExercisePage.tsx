@@ -1,9 +1,14 @@
-import { useEffect } from "react";
-import { Container } from "@mui/material";
-import ExerciseList from "../components/ExerciseList";
+import React, { Suspense, lazy, useEffect } from "react";
+import { Container, Typography, Box, CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import AppBottomNavigation from "../components/AppBottomNavigation";
 import { useTelegram } from "../context/TelegramContext";
 
-const ExercisePage = () => {
+// Lazy load the ExerciseList component
+const ExerciseList = lazy(() => import("../components/ExerciseList"));
+
+const ExercisePage: React.FC = () => {
+  const { t } = useTranslation();
   const { webApp } = useTelegram();
 
   useEffect(() => {
@@ -23,8 +28,34 @@ const ExercisePage = () => {
   }, [webApp]);
 
   return (
-    <Container maxWidth="md" sx={{ py: 2 }}>
-      <ExerciseList />
+    <Container maxWidth="md" sx={{ py: 3, pb: 7 }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" component="h1" gutterBottom align="center">
+          {t("navigation.exercises")}
+        </Typography>
+      </Box>
+
+      <Suspense
+        fallback={
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "60vh",
+            }}
+          >
+            <CircularProgress />
+            <Typography variant="body1" sx={{ ml: 2 }}>
+              {t("common.loading")}
+            </Typography>
+          </Box>
+        }
+      >
+        <ExerciseList />
+      </Suspense>
+
+      <AppBottomNavigation />
     </Container>
   );
 };

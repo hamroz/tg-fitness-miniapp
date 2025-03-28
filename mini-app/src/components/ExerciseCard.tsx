@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import {
   Card,
   CardContent,
@@ -10,10 +10,15 @@ import {
   Collapse,
   Stack,
   Tooltip,
+  Skeleton,
+  CircularProgress,
 } from "@mui/material";
 import LockIcon from "@mui/icons-material/Lock";
 import { Exercise } from "../types/exercise";
-import ExerciseTimer from "./ExerciseTimer";
+import { useTranslation } from "react-i18next";
+
+// Lazy load the ExerciseTimer component
+const ExerciseTimer = lazy(() => import("./ExerciseTimer"));
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -31,9 +36,11 @@ const ExerciseCard = ({
   isPremium = false,
   userSubscription = "free",
 }: ExerciseCardProps) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -46,6 +53,10 @@ const ExerciseCard = ({
   const handleCompleteTimer = () => {
     setCompleted(true);
     onLogWorkout(exercise, { duration: exercise.timer });
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
   };
 
   const placeholderImage =
@@ -70,7 +81,7 @@ const ExerciseCard = ({
     <Card sx={{ maxWidth: "100%", mb: 2, position: "relative" }}>
       {isPremium && (
         <Chip
-          label="Premium"
+          label={t("subscription.premiumPlan")}
           color="secondary"
           size="small"
           sx={{
@@ -102,10 +113,10 @@ const ExerciseCard = ({
         >
           <LockIcon sx={{ fontSize: 48, color: "white", mb: 2 }} />
           <Typography color="white" variant="h6" gutterBottom>
-            Premium Exercise
+            {t("subscription.premiumFeatures")}
           </Typography>
           <Typography color="white" variant="body2" sx={{ mb: 2 }}>
-            Subscribe to our Premium or Individual plan to access this exercise
+            {t("subscription.lockedContent")}
           </Typography>
           <Button
             variant="contained"
@@ -113,9 +124,18 @@ const ExerciseCard = ({
             component="a"
             href="/subscription"
           >
-            View Subscription Plans
+            {t("subscription.viewPlans")}
           </Button>
         </Box>
+      )}
+
+      {!imageLoaded && (
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={200}
+          animation="wave"
+        />
       )}
 
       <CardMedia
@@ -123,8 +143,14 @@ const ExerciseCard = ({
         height="200"
         image={exercise.imageUrl || placeholderImage}
         alt={exercise.name}
-        sx={blurStyle}
+        sx={{
+          ...blurStyle,
+          display: imageLoaded ? "block" : "none",
+        }}
+        onLoad={handleImageLoad}
+        loading="lazy"
       />
+
       <CardContent sx={blurStyle}>
         <Typography gutterBottom variant="h5" component="div">
           {exercise.name}
@@ -138,7 +164,7 @@ const ExerciseCard = ({
           sx={{ mb: 1 }}
         >
           <Chip
-            label={exercise.category}
+            label={t(`exercises.${exercise.category}`)}
             color="primary"
             size="small"
             sx={{ mr: 1, mb: 1 }}
@@ -169,7 +195,7 @@ const ExerciseCard = ({
           }}
         >
           <Button size="small" onClick={handleExpandClick}>
-            {expanded ? "Show Less" : "Learn More"}
+            {expanded ? t("common.back") : t("exercises.viewDetails")}
           </Button>
 
           {exercise.isTimeBased && exercise.timer && !showTimer && (
@@ -179,7 +205,7 @@ const ExerciseCard = ({
               size="small"
               onClick={handleStartTimer}
             >
-              Start Timer ({Math.floor(exercise.timer / 60)}:
+              {t("workout.startTimer")} ({Math.floor(exercise.timer / 60)}:
               {(exercise.timer % 60).toString().padStart(2, "0")})
             </Button>
           )}
@@ -191,7 +217,7 @@ const ExerciseCard = ({
               size="small"
               onClick={() => onLogWorkout(exercise, { reps: 10, sets: 3 })}
             >
-              Log Workout
+              {t("workout.logWorkout")}
             </Button>
           )}
         </Box>
@@ -203,7 +229,7 @@ const ExerciseCard = ({
             </Typography>
 
             <Typography variant="subtitle2" gutterBottom>
-              Equipment:
+              {t("exercises.equipment")}:
             </Typography>
             <Stack
               direction="row"
@@ -226,7 +252,7 @@ const ExerciseCard = ({
             {exercise.videoUrl && (
               <Box sx={{ mt: 2 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Instructional Video:
+                  {t("exercises.instructionalVideo")}:
                 </Typography>
                 <Button
                   variant="outlined"
@@ -236,7 +262,7 @@ const ExerciseCard = ({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Watch Video
+                  {t("exercises.watchVideo")}
                 </Button>
               </Box>
             )}
@@ -245,19 +271,18 @@ const ExerciseCard = ({
 
         {showTimer && (
           <Box sx={{ mt: 2 }}>
-            <ExerciseTimer
-              initialTime={exercise.timer || 30}
-              onComplete={handleCompleteTimer}
-            />
-            {completed && (
-              <Typography
-                variant="subtitle2"
-                color="success.main"
-                sx={{ mt: 1 }}
-              >
-                Great job! Workout logged.
-              </Typography>
-            )}
+            <Suspense
+              fallback={
+                <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+                  <CircularProgress />
+                </Box>
+              }
+            >
+              <ExerciseTimer
+                initialTime={exercise.timer || 30}
+                onComplete={handleCompleteTimer}
+              />
+            </Suspense>
           </Box>
         )}
       </CardContent>

@@ -1,12 +1,16 @@
 import { useEffect } from "react";
-import { Container, Typography, Box } from "@mui/material";
+import { Container, Typography, Box, Paper, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "../components/PhoneInput";
 import { useTelegram } from "../context/TelegramContext";
+import { useTranslation } from "react-i18next";
+import LanguageToggle from "../components/LanguageToggle";
+import AppBottomNavigation from "../components/AppBottomNavigation";
 
 const ProfilePage = () => {
   const { webApp } = useTelegram();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (webApp) {
@@ -35,18 +39,29 @@ const ProfilePage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
+    <Container maxWidth="md" sx={{ py: 3, pb: 7 }}>
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Complete Your Profile
+          {t("profile.personalInfo")}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Please provide your phone number so we can contact you about your
-          fitness journey.
+          {t("profile.phone")}
         </Typography>
       </Box>
 
-      <PhoneInput onSubmit={handlePhoneNumberSubmit} />
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <PhoneInput onSubmit={handlePhoneNumberSubmit} />
+      </Paper>
+
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          {t("profile.preferredLanguage")}
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        <LanguageToggle />
+      </Paper>
+
+      <AppBottomNavigation />
     </Container>
   );
 };

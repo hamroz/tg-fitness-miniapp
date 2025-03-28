@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { mockExercises } from "./data/mockExercises.ts";
+// Import i18n config
+import "./i18n/i18n";
 
 // Setup mock API handlers for development
 import axios from "axios";
