@@ -32,7 +32,7 @@ class SupportHandler {
             const isRussian = ctx.from.language_code === 'ru';
 
             // Set user state to support mode
-            await ctx.session.set('mode', 'support');
+            ctx.session.mode = 'support';
 
             // Send instructions message
             const message = isRussian
@@ -54,7 +54,7 @@ class SupportHandler {
     async handlePotentialSupportMessage(ctx, next) {
         try {
             // If not in support mode or this is a command, pass to next handler
-            if (ctx.session.get('mode') !== 'support' || ctx.message.text?.startsWith('/')) {
+            if (ctx.session.mode !== 'support' || ctx.message.text?.startsWith('/')) {
                 return next();
             }
 
@@ -97,9 +97,9 @@ class SupportHandler {
      */
     async handleCancelCommand(ctx) {
         try {
-            if (ctx.session.get('mode') === 'support') {
+            if (ctx.session.mode === 'support') {
                 // Clear mode
-                await ctx.session.set('mode', null);
+                ctx.session.mode = null;
 
                 // Send confirmation
                 const isRussian = ctx.from.language_code === 'ru';
