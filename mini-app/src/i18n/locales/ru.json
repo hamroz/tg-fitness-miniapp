@@ -20,13 +20,13 @@
     "language": "Язык"
   },
   "navigation": {
-    "home": "Главная (Home)",
-    "exercises": "Упражнения (Exercises)",
-    "workouts": "Тренировки (Workouts)",
-    "progress": "Прогресс (Progress)",
-    "profile": "Профиль (Profile)",
-    "subscription": "Подписка (Subscription)",
-    "settings": "Настройки (Settings)"
+    "home": "Главная",
+    "exercises": "Упражнения",
+    "workouts": "Тренировки",
+    "progress": "Прогресс",
+    "profile": "Профиль",
+    "subscription": "Подписка",
+    "settings": "Настройки"
   },
   "home": {
     "welcome": "Добро пожаловать в Fitness Trainer",
@@ -57,7 +57,14 @@
     "advancedLevel": "Продвинутый",
     "equipment": "Оборудование",
     "instructionalVideo": "Обучающее видео",
-    "watchVideo": "Смотреть видео"
+    "watchVideo": "Смотреть видео",
+    "exerciseLibrary": "Библиотека упражнений",
+    "unlockPremium": "Разблокировать премиум упражнения",
+    "subscribeText": "Подпишитесь на наш Премиум или Индивидуальный план для доступа ко всем упражнениям.",
+    "viewPlans": "Посмотреть планы",
+    "searchExercises": "Поиск упражнений, мышц, оборудования...",
+    "nothingFound": "Упражнения не найдены. Попробуйте другой поиск или категорию.",
+    "failedToLoad": "Не удалось загрузить упражнения. Пожалуйста, попробуйте снова."
   },
   "workout": {
     "logWorkout": "Записать тренировку",
@@ -169,7 +176,10 @@
     "notificationSettings": "Настройки уведомлений",
     "workoutReminders": "Напоминания о тренировках",
     "progressUpdates": "Обновления прогресса",
-    "subscriptionAlerts": "Уведомления о подписке"
+    "subscriptionAlerts": "Уведомления о подписке",
+    "yourPhoneNumber": "Ваш номер телефона",
+    "phoneNumber": "Номер телефона",
+    "savePhoneNumber": "Сохранить номер телефона"
   },
   "settings": {
     "title": "Настройки",
@@ -190,6 +200,39 @@
     "version": "Версия",
     "termsOfService": "Условия использования",
     "privacyPolicy": "Политика конфиденциальности",
-    "contactSupport": "Связаться с поддержкой"
+    "contactSupport": "Связаться с поддержкой",
+    "lightMode": "Светлый режим",
+    "darkMode": "Темный режим",
+    "optimizedForDayViewing": "Оптимизировано для дневного просмотра",
+    "optimizedForNightViewing": "Оптимизировано для ночного просмотра"
+  },
+  "calendar": {
+    "months": [
+      "Январь",
+      "Февраль",
+      "Март",
+      "Апрель",
+      "Май",
+      "Июнь",
+      "Июль",
+      "Август",
+      "Сентябрь",
+      "Октябрь",
+      "Ноябрь",
+      "Декабрь"
+    ],
+    "weekdays": [
+      "Воскресенье",
+      "Понедельник",
+      "Вторник",
+      "Среда",
+      "Четверг",
+      "Пятница",
+      "Суббота"
+    ],
+    "weekdaysShort": ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+    "today": "Сегодня",
+    "workoutsOn": "Тренировки на",
+    "noWorkoutsFound": "Тренировки на эту дату не найдены"
   }
 } 

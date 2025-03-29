@@ -4,6 +4,9 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import enTranslation from "./locales/en.json";
 import ruTranslation from "./locales/ru.json";
 
+// Get the stored language from localStorage or use Russian as default
+const storedLanguage = localStorage.getItem("i18nextLng") || "ru";
+
 i18n
   // detect user language
   .use(LanguageDetector)
@@ -13,6 +16,7 @@ i18n
   .init({
     debug: process.env.NODE_ENV === "development",
     fallbackLng: "ru", // Russian is default
+    lng: storedLanguage, // Force the stored language or default to Russian
     interpolation: {
       escapeValue: false, // not needed for React
     },
@@ -25,7 +29,7 @@ i18n
       },
     },
     detection: {
-      order: ["querystring", "navigator", "localStorage"],
+      order: ["localStorage", "querystring", "navigator"],
       lookupQuerystring: "lang",
       caches: ["localStorage"],
     },

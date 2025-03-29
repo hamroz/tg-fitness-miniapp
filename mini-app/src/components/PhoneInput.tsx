@@ -15,6 +15,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { userApi } from "../services/api";
 import { useTelegram } from "../context/TelegramContext";
+import { useTranslation } from "react-i18next";
 
 // Common country codes
 const countryCodes = [
@@ -44,6 +45,7 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const { user } = useTelegram();
+  const { t } = useTranslation();
 
   const {
     control,
@@ -81,7 +83,7 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
   return (
     <Paper sx={{ p: 3, maxWidth: 500, mx: "auto", mt: 3 }}>
       <Typography variant="h5" gutterBottom>
-        Your Phone Number
+        {t("profile.yourPhoneNumber")}
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -137,7 +139,7 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Phone Number"
+                    label={t("profile.phoneNumber")}
                     placeholder="9XXXXXXXXX"
                     fullWidth
                     error={!!errors.phoneNumber}
@@ -154,7 +156,7 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
               fullWidth
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Saving..." : "Save Phone Number"}
+              {isSubmitting ? "Saving..." : t("profile.savePhoneNumber")}
             </Button>
           </Stack>
         </form>

@@ -6,6 +6,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import NightsStayIcon from "@mui/icons-material/NightsStay";
+import { useTranslation } from "react-i18next";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -27,6 +28,7 @@ const ThemeIconContainer = styled(Box)(({ theme }) => ({
 const ThemeDisplay: React.FC = () => {
   const { mode } = useTheme();
   const muiTheme = useMuiTheme();
+  const { t } = useTranslation();
 
   const isDark = mode === "dark";
 
@@ -60,10 +62,12 @@ const ThemeDisplay: React.FC = () => {
         }}
       >
         <Typography variant="h6" fontWeight="bold">
-          {isDark ? "Dark Mode" : "Light Mode"}
+          {isDark ? t("settings.darkMode") : t("settings.lightMode")}
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-          {isDark ? "Optimized for night viewing" : "Optimized for day viewing"}
+          {isDark
+            ? t("settings.optimizedForNightViewing")
+            : t("settings.optimizedForDayViewing")}
         </Typography>
       </Box>
     </StyledPaper>

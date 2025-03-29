@@ -23,25 +23,14 @@ import ExerciseCard from "./ExerciseCard";
 import WorkoutLogForm from "./WorkoutLogForm";
 import { useTelegram } from "../context/TelegramContext";
 import { Link } from "react-router-dom";
-
-// Define tabs for categories
-const categories: {
-  label: string;
-  value: ExerciseCategory | "all" | "premium";
-}[] = [
-  { label: "All", value: "all" },
-  { label: "Cardio", value: "cardio" },
-  { label: "Strength", value: "strength" },
-  { label: "Flexibility", value: "flexibility" },
-  { label: "Balance", value: "balance" },
-  { label: "Premium", value: "premium" },
-];
+import { useTranslation } from "react-i18next";
 
 // Premium exercise IDs - in a real app, this would come from the backend
 const premiumExerciseIds = ["2", "4", "7", "10"];
 
 const ExerciseList = () => {
   const { user } = useTelegram();
+  const { t } = useTranslation();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +45,16 @@ const ExerciseList = () => {
   const [logFormOpen, setLogFormOpen] = useState(false);
   const [userSubscription, setUserSubscription] = useState("free");
   const [subscriptionChecked, setSubscriptionChecked] = useState(false);
+
+  // Define tabs for categories with translations
+  const categories = [
+    { label: t("exercises.all"), value: "all" },
+    { label: t("exercises.cardio"), value: "cardio" },
+    { label: t("exercises.strength"), value: "strength" },
+    { label: t("exercises.flexibility"), value: "flexibility" },
+    { label: t("exercises.balance"), value: "balance" },
+    { label: t("exercises.premium"), value: "premium" },
+  ];
 
   // Load exercises and check subscription on component mount
   useEffect(() => {
@@ -96,7 +95,7 @@ const ExerciseList = () => {
       setExercises(data);
     } catch (err) {
       console.error("Error loading exercises:", err);
-      setError("Failed to load exercises. Please try again.");
+      setError(t("exercises.failedToLoad"));
     } finally {
       setIsLoading(false);
     }
@@ -180,7 +179,7 @@ const ExerciseList = () => {
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Exercise Library
+        {t("exercises.exerciseLibrary")}
       </Typography>
 
       {userSubscription === "free" && (
@@ -195,11 +194,10 @@ const ExerciseList = () => {
         >
           <Box>
             <Typography variant="subtitle1" gutterBottom>
-              Unlock Premium Exercises
+              {t("exercises.unlockPremium")}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Subscribe to our Premium or Individual plan to access all
-              exercises.
+              {t("exercises.subscribeText")}
             </Typography>
           </Box>
           <Button
@@ -209,7 +207,7 @@ const ExerciseList = () => {
             to="/subscription"
             startIcon={<LockIcon />}
           >
-            View Plans
+            {t("exercises.viewPlans")}
           </Button>
         </Paper>
       )}
@@ -218,7 +216,7 @@ const ExerciseList = () => {
       <TextField
         fullWidth
         variant="outlined"
-        placeholder="Search exercises, muscles, equipment..."
+        placeholder={t("exercises.searchExercises")}
         value={searchQuery}
         onChange={handleSearchChange}
         margin="normal"
@@ -276,7 +274,7 @@ const ExerciseList = () => {
         </Alert>
       ) : filteredExercises.length === 0 ? (
         <Alert severity="info" sx={{ my: 2 }}>
-          No exercises found. Try a different search or category.
+          {t("exercises.nothingFound")}
         </Alert>
       ) : (
         <Grid container spacing={3}>

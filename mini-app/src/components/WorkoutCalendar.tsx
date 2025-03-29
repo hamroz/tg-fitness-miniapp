@@ -16,6 +16,7 @@ import {
 import { WorkoutLog } from "../types/exercise";
 import { workoutApi } from "../services/api";
 import { useTelegram } from "../context/TelegramContext";
+import { useTranslation } from "react-i18next";
 
 // Custom styled Calendar
 const StyledCalendar = styled(Calendar)(({ theme }) => ({
@@ -47,6 +48,7 @@ const WorkoutCalendar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useTelegram();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (user?.id) {
@@ -128,12 +130,26 @@ const WorkoutCalendar = () => {
 
   // Format date for display
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    if (i18n.language === "ru") {
+      const weekdays = t("calendar.weekdays", {
+        returnObjects: true,
+      }) as string[];
+      const months = t("calendar.months", { returnObjects: true }) as string[];
+
+      const weekday = weekdays[date.getDay()];
+      const month = months[date.getMonth()];
+      const day = date.getDate();
+      const year = date.getFullYear();
+
+      return `${weekday}, ${day} ${month} ${year}`;
+    } else {
+      return date.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    }
   };
 
   return (
@@ -143,12 +159,36 @@ const WorkoutCalendar = () => {
           onChange={handleDateChange}
           value={date}
           tileClassName={tileClassName}
+          locale={i18n.language}
+          prevLabel="<"
+          nextLabel=">"
+          prev2Label="<<"
+          next2Label=">>"
+          navigationLabel={({ date, label, locale, view }) => {
+            if (i18n.language === "ru") {
+              const months = t("calendar.months", {
+                returnObjects: true,
+              }) as string[];
+              const month = months[date.getMonth()];
+              return `${month} ${date.getFullYear()}`;
+            }
+            return label;
+          }}
+          formatShortWeekday={(locale, date) => {
+            if (i18n.language === "ru") {
+              const weekdaysShort = t("calendar.weekdaysShort", {
+                returnObjects: true,
+              }) as string[];
+              return weekdaysShort[date.getDay()];
+            }
+            return date.toLocaleDateString(locale, { weekday: "short" });
+          }}
         />
       </Paper>
 
       <Paper sx={{ p: 2 }}>
         <Typography variant="h6" gutterBottom>
-          Workouts on {formatDate(date)}
+          {t("calendar.workoutsOn")} {formatDate(date)}
         </Typography>
 
         {isLoading ? (
@@ -158,7 +198,7 @@ const WorkoutCalendar = () => {
         ) : error ? (
           <Alert severity="error">{error}</Alert>
         ) : workouts.length === 0 ? (
-          <Alert severity="info">No workouts found for this date</Alert>
+          <Alert severity="info">{t("calendar.noWorkoutsFound")}</Alert>
         ) : (
           <List>
             {workouts.map((workout, index) => (
