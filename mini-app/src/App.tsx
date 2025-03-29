@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline } from "@mui/material";
 import { TelegramProvider } from "./context/TelegramContext";
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeContextProvider } from "./context/ThemeContext";
 import HomePage from "./pages/HomePage";
 import ExercisePage from "./pages/ExercisePage";
 import ProgressPage from "./pages/ProgressPage";
@@ -11,9 +11,10 @@ import SettingsPage from "./pages/SettingsPage";
 
 function App() {
   return (
-    <ThemeProvider>
-      <TelegramProvider>
-        <Router>
+    <TelegramProvider>
+      <ThemeContextProvider>
+        <CssBaseline />
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/exercises" element={<ExercisePage />} />
@@ -22,9 +23,9 @@ function App() {
             <Route path="/subscription" element={<SubscriptionPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
-        </Router>
-      </TelegramProvider>
-    </ThemeProvider>
+        </BrowserRouter>
+      </ThemeContextProvider>
+    </TelegramProvider>
   );
 }
 

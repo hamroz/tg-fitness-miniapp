@@ -30,11 +30,13 @@ export const useTheme = (): ThemeContextType => {
   return context;
 };
 
-interface ThemeProviderProps {
+interface ThemeContextProviderProps {
   children: ReactNode;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
+  children,
+}) => {
   const [mode, setMode] = useState<ThemeMode>(() => {
     // Get saved theme from localStorage or default to 'light'
     const savedMode = localStorage.getItem("themeMode");
@@ -84,15 +86,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
               }),
         },
         typography: {
-          fontFamily: [
-            "-apple-system",
-            "BlinkMacSystemFont",
-            '"Segoe UI"',
-            "Roboto",
-            '"Helvetica Neue"',
-            "Arial",
-            "sans-serif",
-          ].join(","),
+          fontFamily:
+            "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+          h1: { fontWeight: 600 },
+          h2: { fontWeight: 600 },
+          h3: { fontWeight: 600 },
+          h4: { fontWeight: 600 },
+          h5: { fontWeight: 600 },
+          h6: { fontWeight: 600 },
+          subtitle1: { fontWeight: 500 },
+          subtitle2: { fontWeight: 500 },
+          body1: { fontWeight: 400 },
+          body2: { fontWeight: 400 },
+          button: { fontWeight: 500 },
         },
         components: {
           MuiButton: {
@@ -101,6 +107,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
                 borderRadius: 8,
                 textTransform: "none",
                 fontWeight: 500,
+                fontFamily: "'Open Sans', sans-serif",
               },
             },
           },
@@ -128,6 +135,20 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
                       ? "0 8px 16px rgba(0,0,0,0.1)"
                       : "0 8px 16px rgba(0,0,0,0.4)",
                 },
+              },
+            },
+          },
+          MuiTypography: {
+            styleOverrides: {
+              root: {
+                fontFamily: "'Open Sans', sans-serif",
+              },
+            },
+          },
+          MuiInputBase: {
+            styleOverrides: {
+              root: {
+                fontFamily: "'Open Sans', sans-serif",
               },
             },
           },

@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import "./assets/fonts.css"; // Import Open Sans font
 import { mockExercises } from "./data/mockExercises.ts";
 // Import i18n config
 import "./i18n/i18n";
