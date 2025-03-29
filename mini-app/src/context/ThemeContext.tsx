@@ -47,6 +47,7 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
   const theme = React.useMemo(
     () =>
       createTheme({
+        spacing: 8, // Base spacing unit (8px)
         palette: {
           mode,
           ...(mode === "light"
@@ -88,17 +89,71 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
         typography: {
           fontFamily:
             "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-          h1: { fontWeight: 600 },
-          h2: { fontWeight: 600 },
-          h3: { fontWeight: 600 },
-          h4: { fontWeight: 600 },
-          h5: { fontWeight: 600 },
-          h6: { fontWeight: 600 },
-          subtitle1: { fontWeight: 500 },
-          subtitle2: { fontWeight: 500 },
-          body1: { fontWeight: 400 },
-          body2: { fontWeight: 400 },
-          button: { fontWeight: 500 },
+          h1: {
+            fontWeight: 700,
+            fontSize: "2.5rem",
+            lineHeight: 1.2,
+            marginBottom: "0.5em",
+          },
+          h2: {
+            fontWeight: 700,
+            fontSize: "2rem",
+            lineHeight: 1.3,
+            marginBottom: "0.5em",
+          },
+          h3: {
+            fontWeight: 600,
+            fontSize: "1.75rem",
+            lineHeight: 1.3,
+            marginBottom: "0.5em",
+          },
+          h4: {
+            fontWeight: 600,
+            fontSize: "1.5rem",
+            lineHeight: 1.4,
+            marginBottom: "0.5em",
+          },
+          h5: {
+            fontWeight: 600,
+            fontSize: "1.25rem",
+            lineHeight: 1.4,
+            marginBottom: "0.5em",
+          },
+          h6: {
+            fontWeight: 600,
+            fontSize: "1.1rem",
+            lineHeight: 1.4,
+            marginBottom: "0.5em",
+          },
+          subtitle1: {
+            fontWeight: 500,
+            fontSize: "1rem",
+            lineHeight: 1.5,
+            marginBottom: "0.5em",
+          },
+          subtitle2: {
+            fontWeight: 500,
+            fontSize: "0.875rem",
+            lineHeight: 1.5,
+            marginBottom: "0.5em",
+          },
+          body1: {
+            fontWeight: 400,
+            fontSize: "1rem",
+            lineHeight: 1.6,
+            marginBottom: "1em",
+          },
+          body2: {
+            fontWeight: 400,
+            fontSize: "0.875rem",
+            lineHeight: 1.6,
+            marginBottom: "1em",
+          },
+          button: {
+            fontWeight: 500,
+            fontSize: "0.875rem",
+            textTransform: "none",
+          },
         },
         components: {
           MuiButton: {
@@ -108,6 +163,16 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
                 textTransform: "none",
                 fontWeight: 500,
                 fontFamily: "'Open Sans', sans-serif",
+                padding: "8px 16px",
+                minHeight: "42px",
+              },
+              sizeLarge: {
+                padding: "12px 24px",
+                fontSize: "1rem",
+              },
+              sizeSmall: {
+                padding: "4px 12px",
+                fontSize: "0.8125rem",
               },
             },
           },
@@ -115,6 +180,7 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
             styleOverrides: {
               root: {
                 borderRadius: 8,
+                padding: 24,
               },
             },
           },
@@ -135,6 +201,8 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
                       ? "0 8px 16px rgba(0,0,0,0.1)"
                       : "0 8px 16px rgba(0,0,0,0.4)",
                 },
+                borderRadius: 8,
+                padding: 24,
               },
             },
           },
@@ -143,12 +211,62 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
               root: {
                 fontFamily: "'Open Sans', sans-serif",
               },
+              gutterBottom: {
+                marginBottom: "1em",
+              },
             },
           },
           MuiInputBase: {
             styleOverrides: {
               root: {
                 fontFamily: "'Open Sans', sans-serif",
+                fontSize: "1rem",
+              },
+            },
+          },
+          MuiFormLabel: {
+            styleOverrides: {
+              root: {
+                fontWeight: 500,
+                fontSize: "0.875rem",
+              },
+            },
+          },
+          MuiDivider: {
+            styleOverrides: {
+              root: {
+                margin: "16px 0",
+              },
+            },
+          },
+          MuiList: {
+            styleOverrides: {
+              root: {
+                padding: "8px 0",
+              },
+            },
+          },
+          MuiListItem: {
+            styleOverrides: {
+              root: {
+                padding: "8px 16px",
+              },
+            },
+          },
+          MuiListItemText: {
+            styleOverrides: {
+              primary: {
+                fontWeight: 500,
+              },
+              secondary: {
+                fontSize: "0.875rem",
+              },
+            },
+          },
+          MuiChip: {
+            styleOverrides: {
+              root: {
+                fontWeight: 500,
               },
             },
           },

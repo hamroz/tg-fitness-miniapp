@@ -1,8 +1,9 @@
 import React, { Suspense, lazy, useEffect } from "react";
-import { Container, Typography, Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import AppBottomNavigation from "../components/AppBottomNavigation";
 import { useTelegram } from "../context/TelegramContext";
+import PageLayout from "../components/PageLayout";
+import SectionHeading from "../components/SectionHeading";
 
 // Lazy load the ExerciseList component
 const ExerciseList = lazy(() => import("../components/ExerciseList"));
@@ -28,12 +29,8 @@ const ExercisePage: React.FC = () => {
   }, [webApp]);
 
   return (
-    <Container maxWidth="md" sx={{ py: 3, pb: 7 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center">
-          {t("navigation.exercises")}
-        </Typography>
-      </Box>
+    <PageLayout>
+      <SectionHeading title={t("navigation.exercises")} align="center" />
 
       <Suspense
         fallback={
@@ -54,9 +51,7 @@ const ExercisePage: React.FC = () => {
       >
         <ExerciseList />
       </Suspense>
-
-      <AppBottomNavigation />
-    </Container>
+    </PageLayout>
   );
 };
 

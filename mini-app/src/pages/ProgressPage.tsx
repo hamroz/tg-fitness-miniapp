@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { Container, Typography, Box } from "@mui/material";
 import WorkoutCalendar from "../components/WorkoutCalendar";
 import { useTelegram } from "../context/TelegramContext";
 import { useTranslation } from "react-i18next";
-import AppBottomNavigation from "../components/AppBottomNavigation";
+import PageLayout from "../components/PageLayout";
+import SectionHeading from "../components/SectionHeading";
 
 const ProgressPage = () => {
   const { webApp } = useTelegram();
@@ -26,20 +26,14 @@ const ProgressPage = () => {
   }, [webApp]);
 
   return (
-    <Container maxWidth="md" sx={{ py: 3, pb: 7 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          {t("navigation.progress")}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t("home.recentWorkouts")}
-        </Typography>
-      </Box>
+    <PageLayout>
+      <SectionHeading
+        title={t("navigation.progress")}
+        subtitle={t("home.recentWorkouts")}
+      />
 
       <WorkoutCalendar />
-
-      <AppBottomNavigation />
-    </Container>
+    </PageLayout>
   );
 };
 

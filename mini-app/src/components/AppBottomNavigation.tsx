@@ -4,6 +4,7 @@ import {
   BottomNavigationAction,
   Paper,
   Badge,
+  useTheme,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
@@ -38,6 +39,7 @@ const AppBottomNavigation: React.FC = () => {
   const location = useLocation();
   const { t } = useTranslation();
   const [value, setValue] = useState(-1);
+  const theme = useTheme();
 
   // Update the value when location changes
   useEffect(() => {
@@ -67,6 +69,11 @@ const AppBottomNavigation: React.FC = () => {
         zIndex: 1000,
         height: NAVBAR_HEIGHT,
         boxShadow: 3,
+        // Fix for dark mode border
+        borderTop: "none",
+        // Replace with background color based on theme mode
+        backgroundColor: theme.palette.background.paper,
+        transition: "all 0.3s ease-in-out",
       }}
       elevation={3}
     >
@@ -77,11 +84,16 @@ const AppBottomNavigation: React.FC = () => {
         sx={{
           width: "100%",
           height: "100%",
+          backgroundColor: "transparent", // Use transparent to avoid black line
           "& .MuiBottomNavigationAction-root": {
             minWidth: 0,
             maxWidth: "100%",
             padding: "6px 0",
             flex: "1 1 20%", // Divide evenly among 5 items
+            transition: "transform 0.2s ease, color 0.3s ease",
+            "&:hover": {
+              transform: "translateY(-2px)",
+            },
           },
           "& .MuiBottomNavigationAction-label": {
             fontSize: "0.65rem",
@@ -89,6 +101,7 @@ const AppBottomNavigation: React.FC = () => {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            transition: "font-size 0.2s ease, font-weight 0.2s ease",
             "&.Mui-selected": {
               fontSize: "0.75rem",
               fontWeight: "500",
@@ -100,6 +113,7 @@ const AppBottomNavigation: React.FC = () => {
           "& .MuiSvgIcon-root": {
             width: "1.5rem",
             height: "1.5rem",
+            transition: "transform 0.3s ease, color 0.3s ease",
           },
         }}
       >
@@ -111,6 +125,10 @@ const AppBottomNavigation: React.FC = () => {
             sx={{
               "&.Mui-selected": {
                 color: "primary.main",
+                "& .MuiSvgIcon-root": {
+                  transform: "scale(1.2)",
+                  color: "primary.main",
+                },
               },
             }}
           />

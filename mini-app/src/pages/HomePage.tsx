@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Button,
-  Stack,
-  Chip,
-} from "@mui/material";
+import { Box, Typography, Paper, Stack, Chip } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useTelegram } from "../context/TelegramContext";
 import { userApi } from "../services/api";
 import { useTranslation } from "react-i18next";
-import AppBottomNavigation from "../components/AppBottomNavigation";
+import PageLayout from "../components/PageLayout";
+import ContentCard from "../components/ContentCard";
+import ActionButton from "../components/ActionButton";
 
 const HomePage = () => {
   const { user, webApp } = useTelegram();
@@ -71,7 +65,7 @@ const HomePage = () => {
   const subscriptionInfo = getSubscriptionInfo();
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4, pb: 7 }}>
+    <PageLayout>
       <Paper
         sx={{
           p: 3,
@@ -109,9 +103,8 @@ const HomePage = () => {
 
       <Stack spacing={3}>
         {!hasPhoneNumber && (
-          <Paper
+          <ContentCard
             sx={{
-              p: 3,
               backgroundColor: "primary.light",
               color: "primary.contrastText",
             }}
@@ -122,63 +115,52 @@ const HomePage = () => {
             <Typography variant="body2" sx={{ mb: 2 }}>
               {t("profile.phone")}
             </Typography>
-            <Button
-              variant="contained"
+            <ActionButton
+              text={t("profile.personalInfo")}
               color="primary"
               component={Link}
               to="/profile"
               fullWidth
-            >
-              {t("profile.personalInfo")}
-            </Button>
-          </Paper>
+            />
+          </ContentCard>
         )}
 
-        <Paper sx={{ p: 3 }}>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              {t("navigation.exercises")}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              {t("exercises.searchPlaceholder")}
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/exercises"
-              fullWidth
-              sx={{ mt: 1 }}
-            >
-              {t("navigation.exercises")}
-            </Button>
-          </Box>
-        </Paper>
+        <ContentCard>
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            {t("navigation.exercises")}
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {t("exercises.searchPlaceholder")}
+          </Typography>
+          <ActionButton
+            text={t("navigation.exercises")}
+            color="primary"
+            component={Link}
+            to="/exercises"
+            fullWidth
+            sx={{ mt: 1 }}
+          />
+        </ContentCard>
 
-        <Paper sx={{ p: 3 }}>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              {t("navigation.progress")}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              {t("home.recentWorkouts")}
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/progress"
-              fullWidth
-              sx={{ mt: 1 }}
-            >
-              {t("navigation.progress")}
-            </Button>
-          </Box>
-        </Paper>
+        <ContentCard>
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            {t("navigation.progress")}
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {t("home.recentWorkouts")}
+          </Typography>
+          <ActionButton
+            text={t("navigation.progress")}
+            color="primary"
+            component={Link}
+            to="/progress"
+            fullWidth
+            sx={{ mt: 1 }}
+          />
+        </ContentCard>
 
-        <Paper
+        <ContentCard
           sx={{
-            p: 3,
             backgroundColor:
               userSubscription === "free"
                 ? "secondary.light"
@@ -189,35 +171,31 @@ const HomePage = () => {
                 : "text.primary",
           }}
         >
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              {userSubscription === "free"
-                ? t("subscription.upgradeNow")
-                : t("subscription.yourPlan")}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              {userSubscription === "free"
-                ? t("subscription.premiumFeatures")
-                : `${t("subscription.currentPlan")}: ${subscriptionInfo.name}`}
-            </Typography>
-            <Button
-              variant="contained"
-              color="secondary"
-              component={Link}
-              to="/subscription"
-              fullWidth
-              sx={{ mt: 1 }}
-            >
-              {userSubscription === "free"
+          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            {userSubscription === "free"
+              ? t("subscription.upgradeNow")
+              : t("subscription.yourPlan")}
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            {userSubscription === "free"
+              ? t("subscription.premiumFeatures")
+              : `${t("subscription.currentPlan")}: ${subscriptionInfo.name}`}
+          </Typography>
+          <ActionButton
+            text={
+              userSubscription === "free"
                 ? t("subscription.choosePlan")
-                : t("subscription.changePlan")}
-            </Button>
-          </Box>
-        </Paper>
+                : t("subscription.changePlan")
+            }
+            color="secondary"
+            component={Link}
+            to="/subscription"
+            fullWidth
+            sx={{ mt: 1 }}
+          />
+        </ContentCard>
       </Stack>
-
-      <AppBottomNavigation />
-    </Container>
+    </PageLayout>
   );
 };
 

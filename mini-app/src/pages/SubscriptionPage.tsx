@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import {
-  Container,
   Typography,
   Box,
   Paper,
   Grid,
-  Button,
   Divider,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Chip,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -19,7 +19,9 @@ import LockIcon from "@mui/icons-material/Lock";
 import { useTelegram } from "../context/TelegramContext";
 import { userApi } from "../services/api";
 import { useTranslation } from "react-i18next";
-import AppBottomNavigation from "../components/AppBottomNavigation";
+import PageLayout from "../components/PageLayout";
+import SectionHeading from "../components/SectionHeading";
+import ActionButton from "../components/ActionButton";
 
 // Subscription tiers data - we'll translate this dynamically
 const subscriptionTiers = [
@@ -81,6 +83,8 @@ const subscriptionTiers = [
 const SubscriptionPage = () => {
   const { webApp, user } = useTelegram();
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
   const [currentSubscription, setCurrentSubscription] = useState("free");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -258,106 +262,166 @@ const SubscriptionPage = () => {
     }
   };
 
-  // Add the rest of the component rendering here
   return (
-    <Container maxWidth="md" sx={{ py: 3, pb: 7 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom align="center">
-          {t("subscription.choosePlan")}
-        </Typography>
-      </Box>
+    <PageLayout>
+      <SectionHeading
+        title={t("subscription.title")}
+        subtitle={t("subscription.chooseYourPlan")}
+        align="center"
+      />
 
-      <Grid container spacing={3}>
-        {subscriptionTiers.map((tier) => (
-          <Grid item xs={12} md={4} key={tier.id}>
-            <Paper
-              sx={{
-                p: 3,
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                border:
-                  tier.id === currentSubscription ? "2px solid" : "1px solid",
-                borderColor:
-                  tier.id === currentSubscription
-                    ? `${tier.color}.main`
-                    : "divider",
-              }}
-            >
-              <Box sx={{ mb: 2 }}>
-                {tier.id === currentSubscription && (
-                  <Chip
-                    label={t("subscription.currentPlan")}
-                    color={tier.color as any}
-                    size="small"
-                    sx={{ mb: 1 }}
-                  />
-                )}
-                <Typography variant="h5" component="h2" gutterBottom>
-                  {t(tier.nameKey)}
-                </Typography>
-                {tier.price > 0 ? (
-                  <Typography variant="h4" color="text.primary">
+      {isLoading ? (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <Typography>{t("common.loading")}</Typography>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            maxWidth: "100%",
+            overflowX: "hidden",
+            mt: 3,
+          }}
+        >
+          <Grid
+            container
+            spacing={2}
+            alignItems="stretch"
+            justifyContent="center"
+            sx={{
+              flexWrap: { xs: "wrap", md: "nowrap" },
+              margin: "0 auto",
+            }}
+          >
+            {subscriptionTiers.map((tier) => (
+              <Grid
+                item
+                key={tier.id}
+                sx={{
+                  display: "flex",
+                  width: { xs: "100%", sm: "80%", md: "calc(33.333% - 16px)" },
+                  maxWidth: { xs: "100%", md: "calc(33.333% - 16px)" },
+                  flexShrink: 0,
+                  flexGrow: 0,
+                }}
+              >
+                <Paper
+                  sx={{
+                    p: 3,
+                    display: "flex",
+                    flexDirection: "column",
+                    border:
+                      tier.id === currentSubscription
+                        ? "2px solid"
+                        : "1px solid transparent",
+                    borderColor:
+                      tier.id === currentSubscription
+                        ? `${tier.color}.main`
+                        : "divider",
+                    position: "relative",
+                    width: "100%",
+                    height: "100%",
+                    transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                    "&:hover": {
+                      transform:
+                        tier.id !== currentSubscription
+                          ? "translateY(-8px)"
+                          : "none",
+                      boxShadow:
+                        tier.id !== currentSubscription
+                          ? "0 12px 20px rgba(0, 0, 0, 0.1)"
+                          : "none",
+                    },
+                  }}
+                  elevation={tier.id === currentSubscription ? 3 : 1}
+                >
+                  {tier.id === currentSubscription && (
+                    <Chip
+                      label={t("subscription.currentPlan")}
+                      color={tier.color as any}
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        fontWeight: 500,
+                      }}
+                    />
+                  )}
+
+                  <Typography variant="h5" component="h2" gutterBottom>
+                    {t(tier.nameKey)}
+                  </Typography>
+
+                  <Typography variant="h4" color={`${tier.color}.main`}>
                     ${tier.price}
                     <Typography
                       component="span"
                       variant="subtitle1"
-                      sx={{ verticalAlign: "baseline" }}
+                      color="text.secondary"
                     >
-                      {tier.billingPeriod}
+                      {tier.billingPeriod && t(tier.billingPeriod)}
                     </Typography>
                   </Typography>
-                ) : (
-                  <Typography variant="h4" color="text.primary">
-                    {t("common.free")}
+
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ mt: 2, mb: 1 }}
+                    color="text.secondary"
+                  >
+                    {t(tier.descriptionKey)}
                   </Typography>
-                )}
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 1 }}
-                >
-                  {t(tier.descriptionKey)}
-                </Typography>
-              </Box>
 
-              <Divider sx={{ my: 2 }} />
+                  <Divider sx={{ my: 2 }} />
 
-              <List sx={{ mb: 2, flexGrow: 1 }}>
-                {tier.features.map((feature, idx) => (
-                  <ListItem key={idx} disableGutters sx={{ py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      {feature.available ? (
-                        <CheckIcon color="success" />
-                      ) : (
-                        <CloseIcon color="error" />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText primary={feature.textKey} />
-                  </ListItem>
-                ))}
-              </List>
+                  <List sx={{ flexGrow: 1, mb: 2 }}>
+                    {tier.features.map((feature, index) => (
+                      <ListItem key={index} dense sx={{ py: 0.5 }}>
+                        <ListItemIcon sx={{ minWidth: 30 }}>
+                          {feature.available ? (
+                            <CheckIcon color={tier.color as any} />
+                          ) : (
+                            <CloseIcon color="disabled" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={t(feature.textKey)}
+                          primaryTypographyProps={{
+                            fontSize: "0.875rem",
+                            fontWeight: feature.available ? "medium" : "normal",
+                            color: feature.available
+                              ? "text.primary"
+                              : "text.disabled",
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
 
-              <Button
-                fullWidth
-                variant={
-                  tier.id === currentSubscription ? "outlined" : "contained"
-                }
-                color={tier.color as any}
-                onClick={() => handleSubscribe(tier.id)}
-                disabled={tier.id === currentSubscription}
-              >
-                {tier.id === currentSubscription
-                  ? t("subscription.currentPlan")
-                  : t(tier.buttonTextKey)}
-              </Button>
-            </Paper>
+                  <Box sx={{ mt: "auto" }}>
+                    <ActionButton
+                      text={
+                        tier.id === currentSubscription
+                          ? t("subscription.currentPlan")
+                          : t(tier.buttonTextKey)
+                      }
+                      variant={
+                        tier.id === currentSubscription
+                          ? "outlined"
+                          : "contained"
+                      }
+                      color={tier.color as any}
+                      fullWidth
+                      disabled={tier.id === currentSubscription}
+                      onClick={() => handleSubscribe(tier.id)}
+                    />
+                  </Box>
+                </Paper>
+              </Grid>
+            ))}
           </Grid>
-        ))}
-      </Grid>
-
-      <AppBottomNavigation />
-    </Container>
+        </Box>
+      )}
+    </PageLayout>
   );
 };
 

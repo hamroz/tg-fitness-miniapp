@@ -102,6 +102,8 @@
     "logCompleted": "Workout logged successfully!"
   },
   "subscription": {
+    "title": "Subscription Plans",
+    "chooseYourPlan": "Select the plan that fits your fitness goals",
     "yourPlan": "Your Plan",
     "currentPlan": "Plan",
     "changePlan": "Change Plan",

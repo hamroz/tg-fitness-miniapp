@@ -102,6 +102,8 @@
     "logCompleted": "Тренировка успешно записана!"
   },
   "subscription": {
+    "title": "Планы подписки",
+    "chooseYourPlan": "Выберите план, соответствующий вашим фитнес-целям",
     "yourPlan": "Ваш план",
     "currentPlan": "План",
     "changePlan": "Изменить план",

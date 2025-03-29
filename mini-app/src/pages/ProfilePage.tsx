@@ -1,11 +1,13 @@
 import { useEffect } from "react";
-import { Container, Typography, Box, Paper, Divider } from "@mui/material";
+import { Typography, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "../components/PhoneInput";
 import { useTelegram } from "../context/TelegramContext";
 import { useTranslation } from "react-i18next";
 import LanguageToggle from "../components/LanguageToggle";
-import AppBottomNavigation from "../components/AppBottomNavigation";
+import PageLayout from "../components/PageLayout";
+import SectionHeading from "../components/SectionHeading";
+import ContentCard from "../components/ContentCard";
 
 const ProfilePage = () => {
   const { webApp } = useTelegram();
@@ -39,30 +41,20 @@ const ProfilePage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 3, pb: 7 }}>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          {t("profile.personalInfo")}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t("profile.phone")}
-        </Typography>
-      </Box>
+    <PageLayout>
+      <SectionHeading
+        title={t("profile.personalInfo")}
+        subtitle={t("profile.phone")}
+      />
 
-      <Paper sx={{ p: 3, mb: 3 }}>
+      <ContentCard>
         <PhoneInput onSubmit={handlePhoneNumberSubmit} />
-      </Paper>
+      </ContentCard>
 
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          {t("profile.preferredLanguage")}
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
+      <ContentCard title={t("profile.preferredLanguage")} divider>
         <LanguageToggle />
-      </Paper>
-
-      <AppBottomNavigation />
-    </Container>
+      </ContentCard>
+    </PageLayout>
   );
 };
 
