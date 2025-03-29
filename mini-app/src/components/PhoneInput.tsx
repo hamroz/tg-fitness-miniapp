@@ -45,7 +45,7 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const { user } = useTelegram();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const {
     control,
@@ -82,20 +82,25 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
 
   return (
     <Paper sx={{ p: 3, maxWidth: 500, mx: "auto", mt: 3 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography
+        variant="h5"
+        gutterBottom
+        key={`phone-title-${i18n.language}`}
+      >
         {t("profile.yourPhoneNumber")}
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Ваш номер нужен только для связи и не будет использован для входа или
-        SMS.
-        <br />
-        Your number is only for contact and won't be used for login or SMS.
+        {i18n.language === "ru"
+          ? "Ваш номер нужен только для связи и не будет использован для входа или SMS."
+          : "Your number is only for contact and won't be used for login or SMS."}
       </Typography>
 
       {success ? (
         <Alert severity="success" sx={{ mb: 2 }}>
-          Your phone number has been saved successfully!
+          {i18n.language === "ru"
+            ? "Ваш номер телефона был успешно сохранен!"
+            : "Your phone number has been saved successfully!"}
         </Alert>
       ) : (
         <form onSubmit={handleSubmit(onSubmitForm)}>
@@ -109,11 +114,13 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
                 rules={{ required: "Country code is required" }}
                 render={({ field }) => (
                   <FormControl sx={{ width: "35%" }}>
-                    <InputLabel id="country-code-label">Code</InputLabel>
+                    <InputLabel id="country-code-label">
+                      {i18n.language === "ru" ? "Код" : "Code"}
+                    </InputLabel>
                     <Select
                       {...field}
                       labelId="country-code-label"
-                      label="Code"
+                      label={i18n.language === "ru" ? "Код" : "Code"}
                       error={!!errors.countryCode}
                     >
                       {countryCodes.map((country) => (
@@ -130,10 +137,16 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
                 name="phoneNumber"
                 control={control}
                 rules={{
-                  required: "Phone number is required",
+                  required:
+                    i18n.language === "ru"
+                      ? "Требуется номер телефона"
+                      : "Phone number is required",
                   pattern: {
                     value: /^[0-9]{7,15}$/,
-                    message: "Please enter a valid phone number",
+                    message:
+                      i18n.language === "ru"
+                        ? "Пожалуйста, введите действительный номер телефона"
+                        : "Please enter a valid phone number",
                   },
                 }}
                 render={({ field }) => (
@@ -156,7 +169,11 @@ const PhoneInput = ({ onSubmit }: PhoneInputProps) => {
               fullWidth
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Saving..." : t("profile.savePhoneNumber")}
+              {isSubmitting
+                ? i18n.language === "ru"
+                  ? "Сохранение..."
+                  : "Saving..."
+                : t("profile.savePhoneNumber")}
             </Button>
           </Stack>
         </form>

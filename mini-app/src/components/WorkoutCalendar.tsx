@@ -54,7 +54,7 @@ const WorkoutCalendar = () => {
     if (user?.id) {
       loadWorkoutHistory();
     }
-  }, [user]);
+  }, [user, i18n.language]);
 
   const loadWorkoutHistory = async () => {
     try {
@@ -187,7 +187,7 @@ const WorkoutCalendar = () => {
       </Paper>
 
       <Paper sx={{ p: 2 }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" gutterBottom key={i18n.language}>
           {t("calendar.workoutsOn")} {formatDate(date)}
         </Typography>
 
@@ -198,7 +198,9 @@ const WorkoutCalendar = () => {
         ) : error ? (
           <Alert severity="error">{error}</Alert>
         ) : workouts.length === 0 ? (
-          <Alert severity="info">{t("calendar.noWorkoutsFound")}</Alert>
+          <Alert severity="info" key={i18n.language}>
+            {t("calendar.noWorkoutsFound")}
+          </Alert>
         ) : (
           <List>
             {workouts.map((workout, index) => (

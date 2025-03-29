@@ -30,7 +30,7 @@ const premiumExerciseIds = ["2", "4", "7", "10"];
 
 const ExerciseList = () => {
   const { user } = useTelegram();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +63,11 @@ const ExerciseList = () => {
       checkUserSubscription();
     }
   }, [user]);
+
+  // Refresh categories when language changes
+  useEffect(() => {
+    // This forces a re-render when language changes
+  }, [i18n.language]);
 
   // Filter exercises when category or search changes
   useEffect(() => {
@@ -178,7 +183,12 @@ const ExerciseList = () => {
 
   return (
     <Container maxWidth="md" sx={{ py: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        key={`exercise-title-${i18n.language}`}
+      >
         {t("exercises.exerciseLibrary")}
       </Typography>
 
@@ -193,10 +203,18 @@ const ExerciseList = () => {
           }}
         >
           <Box>
-            <Typography variant="subtitle1" gutterBottom>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              key={`unlock-title-${i18n.language}`}
+            >
               {t("exercises.unlockPremium")}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              key={`subscribe-text-${i18n.language}`}
+            >
               {t("exercises.subscribeText")}
             </Typography>
           </Box>
@@ -246,7 +264,7 @@ const ExerciseList = () => {
         >
           {categories.map((category) => (
             <Tab
-              key={category.value}
+              key={`${category.value}-${i18n.language}`}
               label={
                 category.value === "premium" ? (
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -269,11 +287,15 @@ const ExerciseList = () => {
           <CircularProgress />
         </Box>
       ) : error ? (
-        <Alert severity="error" sx={{ my: 2 }}>
+        <Alert severity="error" sx={{ my: 2 }} key={`error-${i18n.language}`}>
           {error}
         </Alert>
       ) : filteredExercises.length === 0 ? (
-        <Alert severity="info" sx={{ my: 2 }}>
+        <Alert
+          severity="info"
+          sx={{ my: 2 }}
+          key={`no-results-${i18n.language}`}
+        >
           {t("exercises.nothingFound")}
         </Alert>
       ) : (

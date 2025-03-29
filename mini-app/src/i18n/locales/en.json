@@ -57,7 +57,14 @@
     "advancedLevel": "Advanced",
     "equipment": "Equipment",
     "instructionalVideo": "Instructional Video",
-    "watchVideo": "Watch Video"
+    "watchVideo": "Watch Video",
+    "exerciseLibrary": "Exercise Library",
+    "unlockPremium": "Unlock Premium Exercises",
+    "subscribeText": "Subscribe to our Premium or Individual plan to access all exercises.",
+    "viewPlans": "View Plans",
+    "searchExercises": "Search exercises, muscles, equipment...",
+    "nothingFound": "No exercises found. Try a different search or category.",
+    "failedToLoad": "Failed to load exercises. Please try again."
   },
   "workout": {
     "logWorkout": "Log Workout",
@@ -169,7 +176,10 @@
     "notificationSettings": "Notification Settings",
     "workoutReminders": "Workout Reminders",
     "progressUpdates": "Progress Updates",
-    "subscriptionAlerts": "Subscription Alerts"
+    "subscriptionAlerts": "Subscription Alerts",
+    "yourPhoneNumber": "Your Phone Number",
+    "phoneNumber": "Phone Number",
+    "savePhoneNumber": "Save Phone Number"
   },
   "settings": {
     "title": "Settings",
@@ -190,6 +200,39 @@
     "version": "Version",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
-    "contactSupport": "Contact Support"
+    "contactSupport": "Contact Support",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "optimizedForDayViewing": "Optimized for day viewing",
+    "optimizedForNightViewing": "Optimized for night viewing"
+  },
+  "calendar": {
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "weekdays": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "weekdaysShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "today": "Today",
+    "workoutsOn": "Workouts on",
+    "noWorkoutsFound": "No workouts found for this date"
   }
 } 

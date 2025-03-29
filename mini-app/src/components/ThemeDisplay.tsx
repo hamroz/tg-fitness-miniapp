@@ -28,7 +28,7 @@ const ThemeIconContainer = styled(Box)(({ theme }) => ({
 const ThemeDisplay: React.FC = () => {
   const { mode } = useTheme();
   const muiTheme = useMuiTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const isDark = mode === "dark";
 
@@ -61,10 +61,18 @@ const ThemeDisplay: React.FC = () => {
           justifyContent: "center",
         }}
       >
-        <Typography variant="h6" fontWeight="bold">
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          key={`mode-title-${i18n.language}`}
+        >
           {isDark ? t("settings.darkMode") : t("settings.lightMode")}
         </Typography>
-        <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+        <Typography
+          variant="body2"
+          sx={{ opacity: 0.8, mt: 1 }}
+          key={`mode-desc-${i18n.language}`}
+        >
           {isDark
             ? t("settings.optimizedForNightViewing")
             : t("settings.optimizedForDayViewing")}
