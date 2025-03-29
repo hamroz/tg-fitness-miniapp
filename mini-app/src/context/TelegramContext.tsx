@@ -63,23 +63,26 @@ export const TelegramProvider = ({ children }: TelegramProviderProps) => {
 
     setReady(true);
 
-    // Set app theme based on Telegram theme
+    // Set CSS variables for Telegram theme params
+    // These will be used as fallbacks and accents, but not override our theme system
     document.documentElement.style.setProperty(
-      "--bg-color",
+      "--tg-bg-color",
       tgWebApp.themeParams?.bg_color || "#ffffff"
     );
     document.documentElement.style.setProperty(
-      "--text-color",
+      "--tg-text-color",
       tgWebApp.themeParams?.text_color || "#000000"
     );
     document.documentElement.style.setProperty(
-      "--button-color",
+      "--tg-button-color",
       tgWebApp.themeParams?.button_color || "#2481cc"
     );
     document.documentElement.style.setProperty(
-      "--button-text-color",
+      "--tg-button-text-color",
       tgWebApp.themeParams?.button_text_color || "#ffffff"
     );
+
+    // We no longer set document theme here as it's handled by ThemeContext
   }, []);
 
   return (

@@ -174,7 +174,9 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
-    "darkMode": "Dark Mode",
+    "darkMode": "Theme Mode",
+    "enableDarkMode": "Switch to dark mode for night viewing",
+    "enableLightMode": "Switch to light mode for day viewing",
     "notifications": "Notifications",
     "sound": "Sound",
     "vibration": "Vibration",
