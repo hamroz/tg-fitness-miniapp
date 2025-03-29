@@ -59,5 +59,4 @@ support - Contact support
 ```
 
 ## License
-
-This project is licensed under the MIT License. 
+Fully written & maintained by [Hamroz G.](https://github.com/hamroz)
