@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { Container, Box, useTheme, useMediaQuery, Fade } from "@mui/material";
 import AppBottomNavigation from "./AppBottomNavigation";
 
 interface PageLayoutProps {
@@ -15,8 +14,6 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   children,
   disableBottomNavigation = false,
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isVisible, setIsVisible] = useState(false);
 
   // Animation for page entry
@@ -29,40 +26,17 @@ const PageLayout: React.FC<PageLayoutProps> = ({
   }, []);
 
   return (
-    <Container
-      maxWidth="md"
-      sx={{
-        py: 3,
-        pb: disableBottomNavigation ? 3 : 7,
-        px: { xs: 2, sm: 3 },
-        transition: "all 0.3s ease-in-out",
-      }}
-    >
-      <Fade in={isVisible} timeout={600}>
-        <Box
-          sx={{
-            maxWidth: "100%",
-            mx: "auto",
-            position: "relative",
-            animation: `${isVisible ? "fadeIn 0.8s ease-out" : "none"}`,
-            "@keyframes fadeIn": {
-              "0%": {
-                opacity: 0,
-                transform: "translateY(20px)",
-              },
-              "100%": {
-                opacity: 1,
-                transform: "translateY(0)",
-              },
-            },
-          }}
-        >
-          {children}
-        </Box>
-      </Fade>
+    <div className="w-full max-w-6xl mx-auto py-6 px-4 sm:px-6 md:px-8 lg:px-12 pb-24 transition-all duration-300 ease-in-out">
+      <div
+        className={`max-w-full mx-auto relative ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+        } transition-all duration-600 ease-out`}
+      >
+        {children}
+      </div>
 
       {!disableBottomNavigation && <AppBottomNavigation />}
-    </Container>
+    </div>
   );
 };
 

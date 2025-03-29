@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Box, SxProps, Theme } from "@mui/material";
 
 interface SectionHeadingProps {
   title: string;
   subtitle?: string;
   align?: "left" | "center" | "right";
   spacing?: number;
-  sx?: SxProps<Theme>;
+  className?: string;
   animated?: boolean;
 }
 
@@ -19,7 +18,7 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
   subtitle,
   align = "left",
   spacing = 3,
-  sx = {},
+  className = "",
   animated = true,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -28,7 +27,7 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
     if (animated) {
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, 100);
+      }, 50);
 
       return () => clearTimeout(timer);
     } else {
@@ -36,72 +35,66 @@ const SectionHeading: React.FC<SectionHeadingProps> = ({
     }
   }, [animated]);
 
+  const getAlignmentClass = () => {
+    switch (align) {
+      case "center":
+        return "text-center";
+      case "right":
+        return "text-right";
+      default:
+        return "text-left";
+    }
+  };
+
+  const getSpacingClass = () => {
+    return `mb-${spacing}`;
+  };
+
   return (
-    <Box
-      sx={{
-        mb: spacing,
-        textAlign: align,
-        overflow: "hidden",
-        ...sx,
-      }}
+    <div
+      className={`${getSpacingClass()} ${getAlignmentClass()} overflow-hidden ${className}`}
     >
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        sx={{
-          position: "relative",
-          transform: isVisible ? "translateY(0)" : "translateY(20px)",
-          opacity: isVisible ? 1 : 0,
-          transition: animated
-            ? "transform 0.6s ease-out, opacity 0.6s ease-out"
-            : "none",
-          "&::after":
-            align === "center"
-              ? {
-                  content: '""',
-                  position: "absolute",
-                  bottom: -8,
-                  left: "50%",
-                  width: isVisible ? "40px" : "0px",
-                  height: "3px",
-                  backgroundColor: "primary.main",
-                  transition: "width 0.8s ease",
-                  transform: "translateX(-50%)",
-                }
-              : align === "left"
-              ? {
-                  content: '""',
-                  position: "absolute",
-                  bottom: -8,
-                  left: 0,
-                  width: isVisible ? "40px" : "0px",
-                  height: "3px",
-                  backgroundColor: "primary.main",
-                  transition: "width 0.8s ease",
-                }
-              : {},
+      <h1
+        className={`relative text-2xl font-semibold mb-2 ${
+          animated ? "transition-all duration-300 ease-out" : ""
+        } ${
+          isVisible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
+        }`}
+        style={{
+          ...(align === "center" && {
+            "--tw-after-content": "''",
+          }),
         }}
       >
         {title}
-      </Typography>
+        {align === "center" && (
+          <span
+            className={`absolute -bottom-2 left-1/2 h-[3px] bg-accent -translate-x-1/2 transition-all duration-300 ease-in-out ${
+              isVisible ? "w-10" : "w-0"
+            }`}
+          />
+        )}
+        {align === "left" && (
+          <span
+            className={`absolute -bottom-2 left-0 h-[3px] bg-accent transition-all duration-300 ease-in-out ${
+              isVisible ? "w-10" : "w-0"
+            }`}
+          />
+        )}
+      </h1>
 
       {subtitle && (
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{
-            transform: isVisible ? "translateY(0)" : "translateY(20px)",
-            opacity: isVisible ? 0.85 : 0,
-            transition: animated
-              ? "transform 0.6s ease-out 0.2s, opacity 0.6s ease-out 0.2s"
-              : "none",
-          }}
+        <p
+          className={`text-text-secondary ${
+            animated ? "transition-all duration-300 ease-out" : ""
+          } ${
+            isVisible ? "translate-y-0 opacity-85" : "translate-y-5 opacity-0"
+          }`}
         >
           {subtitle}
-        </Typography>
+        </p>
       )}
-    </Box>
+    </div>
   );
 };
 

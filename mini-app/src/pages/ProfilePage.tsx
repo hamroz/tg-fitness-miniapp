@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Typography, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PhoneInput from "../components/PhoneInput";
 import { useTelegram } from "../context/TelegramContext";
@@ -44,7 +43,8 @@ const ProfilePage = () => {
     <PageLayout>
       <SectionHeading
         title={t("profile.personalInfo")}
-        subtitle={t("profile.phone")}
+        // subtitle={t("profile.phone")}
+        align="center"
       />
 
       <ContentCard>

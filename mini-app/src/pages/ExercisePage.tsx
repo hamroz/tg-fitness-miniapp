@@ -1,5 +1,4 @@
 import React, { Suspense, lazy, useEffect } from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useTelegram } from "../context/TelegramContext";
 import PageLayout from "../components/PageLayout";
@@ -34,19 +33,10 @@ const ExercisePage: React.FC = () => {
 
       <Suspense
         fallback={
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "60vh",
-            }}
-          >
-            <CircularProgress />
-            <Typography variant="body1" sx={{ ml: 2 }}>
-              {t("common.loading")}
-            </Typography>
-          </Box>
+          <div className="flex h-60vh items-center justify-center">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-tg-button border-r-transparent"></div>
+            <p className="ml-4 text-text-secondary">{t("common.loading")}</p>
+          </div>
         }
       >
         <ExerciseList />

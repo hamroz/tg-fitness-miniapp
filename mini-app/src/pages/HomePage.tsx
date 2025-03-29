@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Paper, Stack, Chip } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useTelegram } from "../context/TelegramContext";
 import { userApi } from "../services/api";
@@ -7,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import PageLayout from "../components/PageLayout";
 import ContentCard from "../components/ContentCard";
 import ActionButton from "../components/ActionButton";
+import SectionHeading from "../components/SectionHeading";
 
 const HomePage = () => {
   const { user, webApp } = useTelegram();
@@ -54,11 +54,20 @@ const HomePage = () => {
   const getSubscriptionInfo = () => {
     switch (userSubscription) {
       case "premium":
-        return { name: t("subscription.premiumPlan"), color: "primary" };
+        return {
+          name: t("subscription.premiumPlan"),
+          color: "bg-tg-button text-white",
+        };
       case "individual":
-        return { name: t("subscription.individualPlan"), color: "secondary" };
+        return {
+          name: t("subscription.individualPlan"),
+          color: "bg-accent text-white",
+        };
       default:
-        return { name: t("subscription.freePlan"), color: "default" };
+        return {
+          name: t("subscription.freePlan"),
+          color: "bg-gray-200 text-gray-800",
+        };
     }
   };
 
@@ -66,135 +75,90 @@ const HomePage = () => {
 
   return (
     <PageLayout>
-      <Paper
-        sx={{
-          p: 3,
-          textAlign: "center",
+      <div
+        className="relative mb-8 rounded-lg bg-cover bg-center p-6 text-center text-white"
+        style={{
           backgroundImage:
             "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          color: "white",
-          mb: 4,
-          position: "relative",
         }}
       >
         {!isLoading && (
-          <Chip
-            label={`${subscriptionInfo.name} ${t("subscription.currentPlan")}`}
-            color={subscriptionInfo.color as any}
-            size="small"
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-            }}
-          />
+          <span
+            className={`absolute right-2 top-2 rounded-full px-2 py-0.5 text-xs ${subscriptionInfo.color}`}
+          >
+            {`${subscriptionInfo.name} ${t("subscription.currentPlan")}`}
+          </span>
         )}
-        <Typography variant="h4" component="h1" gutterBottom>
-          Fitness Trainer
-        </Typography>
-        <Typography variant="subtitle1">
+        <h1 className="mb-2 text-2xl font-bold">Fitness Trainer</h1>
+        <p className="text-sm">
           {user
             ? `${t("home.welcome")}, ${user.firstName}!`
             : t("home.welcome")}
-        </Typography>
-      </Paper>
+        </p>
+      </div>
 
-      <Stack spacing={3}>
+      <div className="flex flex-col space-y-6">
         {!hasPhoneNumber && (
-          <ContentCard
-            sx={{
-              backgroundColor: "primary.light",
-              color: "primary.contrastText",
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              {t("profile.personalInfo")}
-            </Typography>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              {t("profile.phone")}
-            </Typography>
+          <ContentCard className="bg-tg-button/10">
+            <h2 className="mb-2 font-semibold">{t("profile.personalInfo")}</h2>
+            <p className="mb-4 text-sm">{t("profile.phone")}</p>
             <ActionButton
               text={t("profile.personalInfo")}
               color="primary"
-              component={Link}
-              to="/profile"
               fullWidth
+              onClick={() => (window.location.href = "/profile")}
             />
           </ContentCard>
         )}
 
         <ContentCard>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-            {t("navigation.exercises")}
-          </Typography>
-          <Typography variant="body2" gutterBottom>
-            {t("exercises.searchPlaceholder")}
-          </Typography>
+          <h2 className="mb-2 font-semibold">{t("navigation.exercises")}</h2>
+          <p className="mb-4 text-sm">{t("exercises.searchPlaceholder")}</p>
           <ActionButton
             text={t("navigation.exercises")}
             color="primary"
-            component={Link}
-            to="/exercises"
             fullWidth
-            sx={{ mt: 1 }}
+            onClick={() => (window.location.href = "/exercises")}
           />
         </ContentCard>
 
         <ContentCard>
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-            {t("navigation.progress")}
-          </Typography>
-          <Typography variant="body2" gutterBottom>
-            {t("home.recentWorkouts")}
-          </Typography>
+          <h2 className="mb-2 font-semibold">{t("navigation.progress")}</h2>
+          <p className="mb-4 text-sm">{t("home.recentWorkouts")}</p>
           <ActionButton
             text={t("navigation.progress")}
             color="primary"
-            component={Link}
-            to="/progress"
             fullWidth
-            sx={{ mt: 1 }}
+            onClick={() => (window.location.href = "/progress")}
           />
         </ContentCard>
 
         <ContentCard
-          sx={{
-            backgroundColor:
-              userSubscription === "free"
-                ? "secondary.light"
-                : "background.paper",
-            color:
-              userSubscription === "free"
-                ? "secondary.contrastText"
-                : "text.primary",
-          }}
+          className={userSubscription === "free" ? "bg-accent/10" : ""}
         >
-          <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          <h2 className="mb-2 font-semibold">
             {userSubscription === "free"
               ? t("subscription.upgradeNow")
               : t("subscription.yourPlan")}
-          </Typography>
-          <Typography variant="body2" gutterBottom>
+          </h2>
+          <p className="mb-4 text-sm">
             {userSubscription === "free"
               ? t("subscription.premiumFeatures")
               : `${t("subscription.currentPlan")}: ${subscriptionInfo.name}`}
-          </Typography>
+          </p>
           <ActionButton
             text={
               userSubscription === "free"
                 ? t("subscription.choosePlan")
                 : t("subscription.changePlan")
             }
-            color="secondary"
-            component={Link}
-            to="/subscription"
+            color="primary"
+            variant="contained"
             fullWidth
-            sx={{ mt: 1 }}
+            onClick={() => (window.location.href = "/subscription")}
           />
         </ContentCard>
-      </Stack>
+      </div>
     </PageLayout>
   );
 };

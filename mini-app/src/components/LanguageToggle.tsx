@@ -1,10 +1,4 @@
 import React, { useEffect } from "react";
-import {
-  Box,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -19,10 +13,7 @@ const LanguageToggle: React.FC = () => {
     localStorage.setItem("i18nextLng", currentLanguage);
   }, [i18n.language]);
 
-  const handleLanguageChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newLanguage: string | null
-  ) => {
+  const handleLanguageChange = (newLanguage: string) => {
     if (newLanguage) {
       i18n.changeLanguage(newLanguage);
       // Explicitly save to localStorage
@@ -31,34 +22,33 @@ const LanguageToggle: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        mt: 2,
-        mb: 2,
-      }}
-    >
-      <Typography variant="subtitle1" gutterBottom>
-        {t("common.language")}
-      </Typography>
-      <ToggleButtonGroup
-        value={i18n.language}
-        exclusive
-        onChange={handleLanguageChange}
-        aria-label="language selection"
-        size="small"
-        sx={{ mb: 2 }}
-      >
-        <ToggleButton value="ru" aria-label="Russian">
+    <div className="flex flex-col items-center my-4">
+      <h3 className="mb-2 text-base font-medium">{t("common.language")}</h3>
+      <div className="inline-flex rounded-md shadow-sm">
+        <button
+          type="button"
+          className={`py-2 px-4 text-sm font-medium rounded-l-lg border border-r-0 focus:z-10 focus:outline-none transition-all duration-200 ${
+            i18n.language === "ru"
+              ? "bg-tg-button text-white border-tg-button"
+              : "bg-paper text-text-secondary border-border hover:bg-tg-button/10"
+          }`}
+          onClick={() => handleLanguageChange("ru")}
+        >
           🇷🇺 Русский
-        </ToggleButton>
-        <ToggleButton value="en" aria-label="English">
+        </button>
+        <button
+          type="button"
+          className={`py-2 px-4 text-sm font-medium rounded-r-lg border focus:z-10 focus:outline-none transition-all duration-200 ${
+            i18n.language === "en"
+              ? "bg-tg-button text-white border-tg-button"
+              : "bg-paper text-text-secondary border-border hover:bg-tg-button/10"
+          }`}
+          onClick={() => handleLanguageChange("en")}
+        >
           🇬🇧 English
-        </ToggleButton>
-      </ToggleButtonGroup>
-    </Box>
+        </button>
+      </div>
+    </div>
   );
 };
 

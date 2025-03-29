@@ -1,24 +1,8 @@
-import { useState, useEffect } from "react";
-import {
-  Typography,
-  Box,
-  Paper,
-  Grid,
-  Divider,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Chip,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import LockIcon from "@mui/icons-material/Lock";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { useTelegram } from "../context/TelegramContext";
 import { userApi } from "../services/api";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../context/ThemeContext";
 import PageLayout from "../components/PageLayout";
 import SectionHeading from "../components/SectionHeading";
 import ActionButton from "../components/ActionButton";
@@ -39,8 +23,9 @@ const subscriptionTiers = [
       { textKey: "Personalized workout plans", available: false },
       { textKey: "Priority support", available: false },
     ],
-    buttonTextKey: "subscription.currentPlan",
-    color: "default",
+    buttonTextKey: "subscription.yourCurrentPlan",
+    color: "bg-gray-100 text-gray-700 border-gray-200",
+    textColor: "text-gray-700",
   },
   {
     id: "premium",
@@ -56,8 +41,9 @@ const subscriptionTiers = [
       { textKey: "Personalized workout plans", available: true },
       { textKey: "Priority support", available: true },
     ],
-    buttonTextKey: "subscription.subscribeNow",
-    color: "primary",
+    buttonTextKey: "subscription.getPremium",
+    color: "bg-tg-button text-white border-tg-button",
+    textColor: "text-tg-button",
   },
   {
     id: "individual",
@@ -76,17 +62,34 @@ const subscriptionTiers = [
       { textKey: "Personal coaching", available: true },
     ],
     buttonTextKey: "subscription.getIndividual",
-    color: "secondary",
+    color: "bg-accent text-white border-accent",
+    textColor: "text-accent",
   },
 ];
 
 const SubscriptionPage = () => {
   const { webApp, user } = useTelegram();
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
+  const { mode } = useTheme();
   const [currentSubscription, setCurrentSubscription] = useState("free");
   const [isLoading, setIsLoading] = useState(true);
+  const [isReady, setIsReady] = useState(false);
+
+  // Delay initial render slightly to ensure theme is applied
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+    return () => cancelAnimationFrame(timer);
+  }, []);
+
+  // Apply theme class to prevent flash
+  useLayoutEffect(() => {
+    document.documentElement.classList.add("theme-applied");
+    return () => {
+      document.documentElement.classList.remove("theme-applied");
+    };
+  }, []);
 
   useEffect(() => {
     if (webApp) {
@@ -244,185 +247,150 @@ const SubscriptionPage = () => {
       const expiryDate = new Date();
       expiryDate.setMonth(expiryDate.getMonth() + 1); // Expire in 1 month
 
-      // Simulate API call
-      // await userApi.updateSubscription(user.id.toString(), tierId, expiryDate.toISOString());
-
       // Update local state
       setCurrentSubscription(tierId);
+      alert(t("subscription.subscriptionUpdated"));
 
-      // Hide main button after successful payment
+      // Hide the main button after subscription
       if (webApp) {
         webApp.MainButton.hide();
       }
-
-      alert(`${t("subscription.currentPlan")}: ${tierId.toUpperCase()}`);
     } catch (error) {
       console.error("Error updating subscription:", error);
       alert(t("common.error"));
     }
   };
 
-  return (
+  return isReady ? (
     <PageLayout>
       <SectionHeading
-        title={t("subscription.title")}
-        subtitle={t("subscription.chooseYourPlan")}
+        title={t("subscription.choosePlan")}
+        // subtitle={t("subscription.choosePlanDesc")}
         align="center"
       />
 
-      {isLoading ? (
-        <Box sx={{ textAlign: "center", py: 4 }}>
-          <Typography>{t("common.loading")}</Typography>
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            maxWidth: "100%",
-            overflowX: "hidden",
-            mt: 3,
-          }}
-        >
-          <Grid
-            container
-            spacing={2}
-            alignItems="stretch"
-            justifyContent="center"
-            sx={{
-              flexWrap: { xs: "wrap", md: "nowrap" },
-              margin: "0 auto",
-            }}
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+        {subscriptionTiers.map((tier) => (
+          <div
+            key={tier.id}
+            className={`relative overflow-hidden rounded-lg border ${
+              currentSubscription === tier.id
+                ? "border-2 border-accent shadow-md"
+                : "border-border"
+            } transition-all duration-300 hover:shadow-lg`}
           >
-            {subscriptionTiers.map((tier) => (
-              <Grid
-                item
-                key={tier.id}
-                sx={{
-                  display: "flex",
-                  width: { xs: "100%", sm: "80%", md: "calc(33.333% - 16px)" },
-                  maxWidth: { xs: "100%", md: "calc(33.333% - 16px)" },
-                  flexShrink: 0,
-                  flexGrow: 0,
-                }}
-              >
-                <Paper
-                  sx={{
-                    p: 3,
-                    display: "flex",
-                    flexDirection: "column",
-                    border:
-                      tier.id === currentSubscription
-                        ? "2px solid"
-                        : "1px solid transparent",
-                    borderColor:
-                      tier.id === currentSubscription
-                        ? `${tier.color}.main`
-                        : "divider",
-                    position: "relative",
-                    width: "100%",
-                    height: "100%",
-                    transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
-                    "&:hover": {
-                      transform:
-                        tier.id !== currentSubscription
-                          ? "translateY(-8px)"
-                          : "none",
-                      boxShadow:
-                        tier.id !== currentSubscription
-                          ? "0 12px 20px rgba(0, 0, 0, 0.1)"
-                          : "none",
-                    },
-                  }}
-                  elevation={tier.id === currentSubscription ? 3 : 1}
-                >
-                  {tier.id === currentSubscription && (
-                    <Chip
-                      label={t("subscription.currentPlan")}
-                      color={tier.color as any}
-                      size="small"
-                      sx={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        fontWeight: 500,
-                      }}
-                    />
-                  )}
+            {currentSubscription === tier.id && (
+              <div className="absolute right-0 top-0 bg-accent px-3 py-1 text-xs font-medium text-white">
+                {t("subscription.currentPlan")}
+              </div>
+            )}
 
-                  <Typography variant="h5" component="h2" gutterBottom>
-                    {t(tier.nameKey)}
-                  </Typography>
+            <div
+              className={`p-6 ${
+                tier.id === "premium"
+                  ? "bg-tg-button/5"
+                  : tier.id === "individual"
+                  ? "bg-accent/5"
+                  : ""
+              }`}
+            >
+              <h3 className="text-lg font-semibold">{t(tier.nameKey)}</h3>
 
-                  <Typography variant="h4" color={`${tier.color}.main`}>
-                    ${tier.price}
-                    <Typography
-                      component="span"
-                      variant="subtitle1"
-                      color="text.secondary"
-                    >
-                      {tier.billingPeriod && t(tier.billingPeriod)}
-                    </Typography>
-                  </Typography>
+              <div className="mt-4 flex items-baseline">
+                <span className="text-3xl font-bold">${tier.price}</span>
+                <span className="ml-1 text-sm text-text-secondary">
+                  {tier.billingPeriod}
+                </span>
+              </div>
 
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ mt: 2, mb: 1 }}
-                    color="text.secondary"
-                  >
-                    {t(tier.descriptionKey)}
-                  </Typography>
+              <p className="mt-4 text-sm text-text-secondary">
+                {t(tier.descriptionKey)}
+              </p>
+            </div>
 
-                  <Divider sx={{ my: 2 }} />
-
-                  <List sx={{ flexGrow: 1, mb: 2 }}>
-                    {tier.features.map((feature, index) => (
-                      <ListItem key={index} dense sx={{ py: 0.5 }}>
-                        <ListItemIcon sx={{ minWidth: 30 }}>
-                          {feature.available ? (
-                            <CheckIcon color={tier.color as any} />
-                          ) : (
-                            <CloseIcon color="disabled" />
-                          )}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={t(feature.textKey)}
-                          primaryTypographyProps={{
-                            fontSize: "0.875rem",
-                            fontWeight: feature.available ? "medium" : "normal",
-                            color: feature.available
-                              ? "text.primary"
-                              : "text.disabled",
-                          }}
+            <div className="border-t border-border bg-paper/50 px-6 py-4">
+              <h4 className="text-sm font-semibold uppercase">
+                {t("subscription.features")}
+              </h4>
+              <ul className="mt-2 space-y-2">
+                {tier.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-center text-sm">
+                    {feature.available ? (
+                      <svg
+                        className="mr-2 h-5 w-5 text-green-500"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
                         />
-                      </ListItem>
-                    ))}
-                  </List>
+                      </svg>
+                    ) : (
+                      <svg
+                        className="mr-2 h-5 w-5 text-red-500"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    <span
+                      className={
+                        feature.available
+                          ? ""
+                          : "text-text-secondary line-through"
+                      }
+                    >
+                      {t(feature.textKey)}
+                    </span>
+                    {!feature.available && tier.id === "free" && (
+                      <svg
+                        className="ml-1 h-4 w-4 text-text-secondary"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 116 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-                  <Box sx={{ mt: "auto" }}>
-                    <ActionButton
-                      text={
-                        tier.id === currentSubscription
-                          ? t("subscription.currentPlan")
-                          : t(tier.buttonTextKey)
-                      }
-                      variant={
-                        tier.id === currentSubscription
-                          ? "outlined"
-                          : "contained"
-                      }
-                      color={tier.color as any}
-                      fullWidth
-                      disabled={tier.id === currentSubscription}
-                      onClick={() => handleSubscribe(tier.id)}
-                    />
-                  </Box>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
+            <div className="p-6">
+              <ActionButton
+                text={
+                  currentSubscription === tier.id
+                    ? t("subscription.yourCurrentPlan")
+                    : t(tier.buttonTextKey)
+                }
+                variant={
+                  currentSubscription === tier.id ? "outlined" : "contained"
+                }
+                color="primary"
+                fullWidth
+                disabled={currentSubscription === tier.id}
+                onClick={() => handleSubscribe(tier.id)}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </PageLayout>
-  );
+  ) : null;
 };
 
 export default SubscriptionPage;

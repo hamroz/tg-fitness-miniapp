@@ -1,19 +1,4 @@
 import { useState, Suspense, lazy } from "react";
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Button,
-  Chip,
-  Box,
-  Collapse,
-  Stack,
-  Tooltip,
-  Skeleton,
-  CircularProgress,
-} from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
 import { Exercise } from "../types/exercise";
 import { useTranslation } from "react-i18next";
 
@@ -30,6 +15,12 @@ interface ExerciseCardProps {
   userSubscription?: string;
 }
 
+// Extend the Exercise type with optional fields that might be added later
+interface ExtendedExercise extends Exercise {
+  instructions?: string[];
+  tips?: string[];
+}
+
 const ExerciseCard = ({
   exercise,
   onLogWorkout,
@@ -41,6 +32,9 @@ const ExerciseCard = ({
   const [showTimer, setShowTimer] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Cast exercise to ExtendedExercise to handle optional fields
+  const extendedExercise = exercise as ExtendedExercise;
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -68,225 +62,248 @@ const ExerciseCard = ({
     userSubscription === "premium" ||
     userSubscription === "individual";
 
-  // Apply blur effect for premium exercises that user doesn't have access to
-  const blurStyle = !hasAccess
-    ? {
-        filter: "blur(5px)",
-        opacity: 0.7,
-        pointerEvents: "none" as const,
-      }
-    : {};
-
   return (
-    <Card sx={{ maxWidth: "100%", mb: 2, position: "relative" }}>
-      {isPremium && (
-        <Chip
-          label={t("subscription.premiumPlan")}
-          color="secondary"
-          size="small"
-          sx={{
-            position: "absolute",
-            top: 10,
-            right: 10,
-            zIndex: 2,
-          }}
-        />
-      )}
+    <div className="w-full mb-6 overflow-hidden bg-paper rounded-xl shadow-sm hover:shadow-md transition-all duration-300 animate-scale-in">
+      <div className="relative">
+        {isPremium && (
+          <span className="absolute top-3 right-3 z-10 px-2.5 py-1 text-xs font-medium bg-accent/80 text-white rounded-full backdrop-blur-sm">
+            {t("subscription.premiumPlan")}
+          </span>
+        )}
 
-      {isPremium && !hasAccess && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgba(0,0,0,0.4)",
-            zIndex: 1,
-            p: 3,
-            textAlign: "center",
-          }}
-        >
-          <LockIcon sx={{ fontSize: 48, color: "white", mb: 2 }} />
-          <Typography color="white" variant="h6" gutterBottom>
-            {t("subscription.premiumFeatures")}
-          </Typography>
-          <Typography color="white" variant="body2" sx={{ mb: 2 }}>
-            {t("subscription.lockedContent")}
-          </Typography>
-          <Button
-            variant="contained"
-            color="secondary"
-            component="a"
-            href="/subscription"
-          >
-            {t("subscription.viewPlans")}
-          </Button>
-        </Box>
-      )}
+        {isPremium && !hasAccess && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-sm bg-gray-900/70 z-10 p-6 text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 mb-4 text-white"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <h3 className="text-white text-lg font-semibold mb-2">
+              {t("subscription.premiumFeatures")}
+            </h3>
+            <p className="text-white/80 text-sm mb-4">
+              {t("subscription.lockedContent")}
+            </p>
+            <a
+              href="/subscription"
+              className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent/90 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              {t("subscription.viewPlans")}
+            </a>
+          </div>
+        )}
 
-      {!imageLoaded && (
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height={200}
-          animation="wave"
-        />
-      )}
+        {!imageLoaded && (
+          <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 animate-pulse" />
+        )}
 
-      <CardMedia
-        component="img"
-        height="200"
-        image={exercise.imageUrl || placeholderImage}
-        alt={exercise.name}
-        sx={{
-          ...blurStyle,
-          display: imageLoaded ? "block" : "none",
-        }}
-        onLoad={handleImageLoad}
-        loading="lazy"
-      />
-
-      <CardContent sx={blurStyle}>
-        <Typography gutterBottom variant="h5" component="div">
-          {exercise.name}
-        </Typography>
-
-        <Stack
-          direction="row"
-          spacing={1}
-          flexWrap="wrap"
-          useFlexGap
-          sx={{ mb: 1 }}
-        >
-          <Chip
-            label={t(`exercises.${exercise.category}`)}
-            color="primary"
-            size="small"
-            sx={{ mr: 1, mb: 1 }}
+        <div className="h-48 overflow-hidden">
+          <img
+            src={exercise.imageUrl || placeholderImage}
+            alt={exercise.name}
+            className={`w-full h-full object-cover transition-transform duration-500 hover:scale-105 ${
+              !hasAccess ? "blur-sm opacity-70" : ""
+            } ${imageLoaded ? "block" : "hidden"}`}
+            onLoad={handleImageLoad}
+            loading="lazy"
           />
+        </div>
+      </div>
+
+      <div
+        className={`p-5 ${
+          !hasAccess ? "blur-sm opacity-70 pointer-events-none" : ""
+        }`}
+      >
+        <div className="flex justify-between items-start mb-3">
+          <h2 className="text-xl font-semibold text-text">{exercise.name}</h2>
+          <span className="px-2 py-0.5 text-xs font-medium bg-accent/10 text-accent rounded-md">
+            {t(`exercises.${exercise.category}`)}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5 mb-3">
           {exercise.muscleGroup.map((muscle) => (
-            <Chip
+            <span
               key={muscle}
-              label={muscle}
-              variant="outlined"
-              size="small"
-              sx={{ mr: 1, mb: 1 }}
-            />
+              className="px-2 py-0.5 text-xs font-medium text-text-secondary bg-border/30 rounded-md"
+            >
+              {muscle}
+            </span>
           ))}
-        </Stack>
+        </div>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {exercise.description.length > 120
-            ? `${exercise.description.substring(0, 120)}...`
-            : exercise.description}
-        </Typography>
+        <p className="text-sm text-text-secondary mb-4 line-clamp-2">
+          {exercise.description}
+        </p>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 1,
-          }}
-        >
-          <Button size="small" onClick={handleExpandClick}>
+        <div className="flex justify-between items-center">
+          <button
+            onClick={handleExpandClick}
+            className="text-sm text-accent hover:text-accent/80 hover:underline focus:outline-none transition-colors"
+            aria-expanded={expanded}
+          >
             {expanded ? t("common.back") : t("exercises.viewDetails")}
-          </Button>
+          </button>
 
-          {exercise.isTimeBased && exercise.timer && !showTimer && (
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={handleStartTimer}
-            >
-              {t("workout.startTimer")} ({Math.floor(exercise.timer / 60)}:
-              {(exercise.timer % 60).toString().padStart(2, "0")})
-            </Button>
-          )}
-
-          {!exercise.isTimeBased && (
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => onLogWorkout(exercise, { reps: 10, sets: 3 })}
-            >
-              {t("workout.logWorkout")}
-            </Button>
-          )}
-        </Box>
-
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="body2" paragraph>
-              {exercise.description}
-            </Typography>
-
-            <Typography variant="subtitle2" gutterBottom>
-              {t("exercises.equipment")}:
-            </Typography>
-            <Stack
-              direction="row"
-              spacing={1}
-              flexWrap="wrap"
-              useFlexGap
-              sx={{ mb: 2 }}
-            >
-              {exercise.equipment.map((item) => (
-                <Chip
-                  key={item}
-                  label={item}
-                  variant="outlined"
-                  size="small"
-                  sx={{ mr: 1, mb: 1 }}
-                />
-              ))}
-            </Stack>
-
-            {exercise.videoUrl && (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t("exercises.instructionalVideo")}:
-                </Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  component="a"
-                  href={exercise.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+          {!expanded && (
+            <div className="flex space-x-2">
+              {exercise.isTimeBased && exercise.timer && !showTimer && (
+                <button
+                  onClick={handleStartTimer}
+                  className="px-3 py-1.5 text-sm font-medium bg-accent text-white rounded-lg hover:bg-accent/90 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
                 >
-                  {t("exercises.watchVideo")}
-                </Button>
-              </Box>
-            )}
-          </Box>
-        </Collapse>
+                  <span className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1.5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {Math.floor(exercise.timer / 60)}:
+                    {(exercise.timer % 60).toString().padStart(2, "0")}
+                  </span>
+                </button>
+              )}
+
+              {!exercise.isTimeBased && (
+                <button
+                  onClick={() => onLogWorkout(exercise, { reps: 10, sets: 3 })}
+                  className="px-3 py-1.5 text-sm font-medium bg-accent text-white rounded-lg hover:bg-accent/90 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+                >
+                  <span className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1.5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    {t("workout.logWorkout")}
+                  </span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {expanded && (
+          <div className="mt-4 animate-slide-up">
+            <p className="text-sm text-text-secondary mb-5">
+              {exercise.description}
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold mb-2 text-text">
+                  {t("exercises.equipment")}
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {exercise.equipment.map((item) => (
+                    <span
+                      key={item}
+                      className="px-2 py-0.5 text-xs font-medium text-text-secondary bg-border/30 rounded-md"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {extendedExercise.instructions &&
+                extendedExercise.instructions.length > 0 && (
+                  <div className="p-4 bg-bg rounded-lg">
+                    <h3 className="text-sm font-semibold mb-2 text-text">
+                      {t("exercises.instructions")}
+                    </h3>
+                    <ol className="list-decimal list-inside text-sm space-y-2 text-text-secondary">
+                      {extendedExercise.instructions.map(
+                        (step: string, index: number) => (
+                          <li key={index} className="pl-1">
+                            {step}
+                          </li>
+                        )
+                      )}
+                    </ol>
+                  </div>
+                )}
+
+              {extendedExercise.tips && extendedExercise.tips.length > 0 && (
+                <div className="p-4 bg-accent/5 rounded-lg border-l-2 border-accent">
+                  <h3 className="text-sm font-semibold mb-2 text-accent">
+                    {t("exercises.tips")}
+                  </h3>
+                  <ul className="text-sm space-y-2 text-text-secondary">
+                    {extendedExercise.tips.map((tip: string, index: number) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-accent inline-block mr-2 mt-1">
+                          •
+                        </span>
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {showTimer && (
-          <Box sx={{ mt: 2 }}>
+          <div className="mt-6 animate-slide-up">
             <Suspense
               fallback={
-                <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-                  <CircularProgress />
-                </Box>
+                <div className="flex justify-center items-center h-32">
+                  <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                </div>
               }
             >
               <ExerciseTimer
-                initialTime={exercise.timer || 30}
+                initialTime={exercise.timer || 60}
                 onComplete={handleCompleteTimer}
               />
             </Suspense>
-          </Box>
+            {completed && (
+              <div className="mt-4 p-3 flex items-center bg-success-color/10 text-success-color border border-success-color/20 rounded-lg animate-fade-in">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>
+                  {t("workout.completed")}! {t("workout.logged")}
+                </span>
+              </div>
+            )}
+          </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

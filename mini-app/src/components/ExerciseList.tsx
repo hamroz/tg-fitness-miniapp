@@ -1,328 +1,175 @@
-import { useState, useEffect } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Tabs,
-  Tab,
-  CircularProgress,
-  Alert,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Grid,
-  Paper,
-  Button,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import ClearIcon from "@mui/icons-material/Clear";
-import LockIcon from "@mui/icons-material/Lock";
-import { Exercise, ExerciseCategory, WorkoutLog } from "../types/exercise";
-import { exerciseApi, userApi } from "../services/api";
-import ExerciseCard from "./ExerciseCard";
-import WorkoutLogForm from "./WorkoutLogForm";
-import { useTelegram } from "../context/TelegramContext";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import ContentCard from "./ContentCard";
 
-// Premium exercise IDs - in a real app, this would come from the backend
-const premiumExerciseIds = ["2", "4", "7", "10"];
+const categories = ["all", "cardio", "strength", "flexibility", "balance"];
 
-const ExerciseList = () => {
-  const { user } = useTelegram();
-  const { t, i18n } = useTranslation();
+interface Exercise {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  imageUrl: string;
+  isPremium: boolean;
+}
+
+const ExerciseList: React.FC = () => {
+  const { t } = useTranslation();
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<
-    ExerciseCategory | "all" | "premium"
-  >("all");
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
-    null
-  );
-  const [logFormOpen, setLogFormOpen] = useState(false);
-  const [userSubscription, setUserSubscription] = useState("free");
-  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
 
-  // Define tabs for categories with translations
-  const categories = [
-    { label: t("exercises.all"), value: "all" },
-    { label: t("exercises.cardio"), value: "cardio" },
-    { label: t("exercises.strength"), value: "strength" },
-    { label: t("exercises.flexibility"), value: "flexibility" },
-    { label: t("exercises.balance"), value: "balance" },
-    { label: t("exercises.premium"), value: "premium" },
-  ];
-
-  // Load exercises and check subscription on component mount
   useEffect(() => {
-    loadExercises();
-    if (user?.id) {
-      checkUserSubscription();
-    }
-  }, [user]);
+    // Simulate fetching exercises
+    setTimeout(() => {
+      const demoExercises: Exercise[] = [
+        {
+          id: "1",
+          name: "Running",
+          category: "cardio",
+          description: "Cardio exercise for endurance",
+          imageUrl:
+            "https://images.unsplash.com/photo-1571008887538-b36bb32f4571",
+          isPremium: false,
+        },
+        {
+          id: "2",
+          name: "Pushups",
+          category: "strength",
+          description: "Upper body strength exercise",
+          imageUrl:
+            "https://images.unsplash.com/photo-1616803689943-5601631c7fec",
+          isPremium: false,
+        },
+        {
+          id: "3",
+          name: "Yoga",
+          category: "flexibility",
+          description: "Flexibility and balance exercise",
+          imageUrl:
+            "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b",
+          isPremium: true,
+        },
+      ];
 
-  // Refresh categories when language changes
-  useEffect(() => {
-    // This forces a re-render when language changes
-  }, [i18n.language]);
+      setExercises(demoExercises);
+      setLoading(false);
+    }, 1000);
+  }, []);
 
-  // Filter exercises when category or search changes
-  useEffect(() => {
-    filterExercises();
-  }, [activeCategory, searchQuery, exercises, userSubscription]);
-
-  const checkUserSubscription = async () => {
-    try {
-      if (!user?.id) return;
-
-      const userData = await userApi.getUserData(user.id.toString());
-      if (userData?.subscription) {
-        setUserSubscription(userData.subscription);
-      }
-      setSubscriptionChecked(true);
-    } catch (err) {
-      console.error("Error checking subscription:", err);
-      // Default to free if there's an error
-      setUserSubscription("free");
-      setSubscriptionChecked(true);
-    }
-  };
-
-  const loadExercises = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const data = await exerciseApi.getExercises();
-      setExercises(data);
-    } catch (err) {
-      console.error("Error loading exercises:", err);
-      setError(t("exercises.failedToLoad"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filterExercises = () => {
-    let filtered = [...exercises];
-
-    // Filter by category
-    if (activeCategory === "premium") {
-      filtered = filtered.filter((exercise) => isPremiumExercise(exercise._id));
-    } else if (activeCategory !== "all") {
-      filtered = filtered.filter(
-        (exercise) => exercise.category === activeCategory
-      );
-    }
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (exercise) =>
-          exercise.name.toLowerCase().includes(query) ||
-          exercise.description.toLowerCase().includes(query) ||
-          exercise.muscleGroup.some((muscle) =>
-            muscle.toLowerCase().includes(query)
-          ) ||
-          exercise.equipment.some((item) => item.toLowerCase().includes(query))
-      );
-    }
-
-    setFilteredExercises(filtered);
-  };
-
-  const isPremiumExercise = (exerciseId: string): boolean => {
-    return premiumExerciseIds.includes(exerciseId);
-  };
-
-  const handleCategoryChange = (
-    _event: React.SyntheticEvent,
-    newValue: ExerciseCategory | "all" | "premium"
-  ) => {
-    setActiveCategory(newValue);
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-  };
-
-  const handleLogWorkout = (
-    exercise: Exercise,
-    data: { reps?: number; sets?: number; duration?: number }
-  ) => {
-    // Check if premium exercise and user has appropriate subscription
-    if (
-      isPremiumExercise(exercise._id) &&
-      userSubscription !== "premium" &&
-      userSubscription !== "individual"
-    ) {
-      return; // User doesn't have access
-    }
-
-    setSelectedExercise(exercise);
-    setLogFormOpen(true);
-  };
-
-  const handleWorkoutLogged = (log: WorkoutLog) => {
-    console.log("Workout logged:", log);
-    // You might want to update UI or show a success message
-  };
-
-  const handleSubscribeClick = () => {
-    // Navigate to subscription page
-    window.location.href = "/subscription";
-  };
+  const filteredExercises = exercises.filter((exercise) => {
+    const matchesCategory =
+      category === "all" || exercise.category === category;
+    const matchesSearch = exercise.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <Container maxWidth="md" sx={{ py: 3 }}>
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        key={`exercise-title-${i18n.language}`}
-      >
-        {t("exercises.exerciseLibrary")}
-      </Typography>
-
-      {userSubscription === "free" && (
-        <Paper
-          sx={{
-            p: 2,
-            mb: 3,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Box>
-            <Typography
-              variant="subtitle1"
-              gutterBottom
-              key={`unlock-title-${i18n.language}`}
+    <div className="mt-4">
+      {/* Search bar */}
+      <div className="mb-6 relative">
+        <div className="relative">
+          <input
+            type="text"
+            className="w-full rounded-lg border border-border bg-paper px-4 py-2 pl-10 text-text outline-none focus:border-tg-button"
+            placeholder={t("exercises.searchPlaceholder")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-text-secondary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
             >
-              {t("exercises.unlockPremium")}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              key={`subscribe-text-${i18n.language}`}
-            >
-              {t("exercises.subscribeText")}
-            </Typography>
-          </Box>
-          <Button
-            variant="contained"
-            color="secondary"
-            component={Link}
-            to="/subscription"
-            startIcon={<LockIcon />}
-          >
-            {t("exercises.viewPlans")}
-          </Button>
-        </Paper>
-      )}
-
-      {/* Search Bar */}
-      <TextField
-        fullWidth
-        variant="outlined"
-        placeholder={t("exercises.searchExercises")}
-        value={searchQuery}
-        onChange={handleSearchChange}
-        margin="normal"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-          endAdornment: searchQuery && (
-            <InputAdornment position="end">
-              <IconButton onClick={clearSearch} edge="end">
-                <ClearIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
-
-      {/* Category Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
-        <Tabs
-          value={activeCategory}
-          onChange={handleCategoryChange}
-          variant="scrollable"
-          scrollButtons="auto"
-        >
-          {categories.map((category) => (
-            <Tab
-              key={`${category.value}-${i18n.language}`}
-              label={
-                category.value === "premium" ? (
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {category.label}
-                    <LockIcon fontSize="small" sx={{ ml: 0.5 }} />
-                  </Box>
-                ) : (
-                  category.label
-                )
-              }
-              value={category.value}
-            />
-          ))}
-        </Tabs>
-      </Box>
-
-      {/* Exercise Cards */}
-      {isLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : error ? (
-        <Alert severity="error" sx={{ my: 2 }} key={`error-${i18n.language}`}>
-          {error}
-        </Alert>
-      ) : filteredExercises.length === 0 ? (
-        <Alert
-          severity="info"
-          sx={{ my: 2 }}
-          key={`no-results-${i18n.language}`}
-        >
-          {t("exercises.nothingFound")}
-        </Alert>
-      ) : (
-        <Grid container spacing={3}>
-          {filteredExercises.map((exercise) => (
-            <Grid item xs={12} key={exercise._id}>
-              <ExerciseCard
-                exercise={exercise}
-                onLogWorkout={handleLogWorkout}
-                isPremium={isPremiumExercise(exercise._id)}
-                userSubscription={userSubscription}
+              <path
+                fillRule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clipRule="evenodd"
               />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+            </svg>
+          </div>
+          {searchQuery && (
+            <button
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-text-secondary"
+              onClick={() => setSearchQuery("")}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
 
-      {/* Workout Log Form */}
-      {selectedExercise && (
-        <WorkoutLogForm
-          exercise={selectedExercise}
-          open={logFormOpen}
-          onClose={() => setLogFormOpen(false)}
-          onSuccess={handleWorkoutLogged}
-        />
+      {/* Category tabs */}
+      <div className="mb-6 flex items-center space-x-2 overflow-x-auto pb-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            className={`flex-shrink-0 rounded-full px-4 py-1 text-sm font-medium capitalize transition-all duration-200 ${
+              category === cat
+                ? "bg-tg-button text-white"
+                : "bg-paper text-text-secondary hover:bg-tg-button/10"
+            }`}
+            onClick={() => setCategory(cat)}
+          >
+            {t(`exercises.categories.${cat}`)}
+          </button>
+        ))}
+      </div>
+
+      {/* Exercise list */}
+      {loading ? (
+        <div className="flex h-60 items-center justify-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-tg-button border-r-transparent"></div>
+          <p className="ml-4 text-text-secondary">{t("common.loading")}</p>
+        </div>
+      ) : filteredExercises.length === 0 ? (
+        <div className="py-10 text-center text-text-secondary">
+          <p>{t("exercises.noResults")}</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredExercises.map((exercise) => (
+            <ContentCard key={exercise.id}>
+              <div className="flex items-center">
+                <div
+                  className="h-16 w-16 rounded bg-cover bg-center"
+                  style={{ backgroundImage: `url(${exercise.imageUrl})` }}
+                ></div>
+                <div className="ml-4 flex-grow">
+                  <div className="flex items-center">
+                    <h3 className="text-lg font-semibold">{exercise.name}</h3>
+                    {exercise.isPremium && (
+                      <span className="ml-2 rounded bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent">
+                        Premium
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-text-secondary">
+                    {exercise.description}
+                  </p>
+                </div>
+              </div>
+            </ContentCard>
+          ))}
+        </div>
       )}
-    </Container>
+    </div>
   );
 };
 

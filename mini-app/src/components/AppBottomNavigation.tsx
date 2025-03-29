@@ -1,35 +1,112 @@
 import React, { useState, useEffect } from "react";
-import {
-  BottomNavigation,
-  BottomNavigationAction,
-  Paper,
-  Badge,
-  useTheme,
-} from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
-import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
-import TimelineIcon from "@mui/icons-material/Timeline";
-import PersonIcon from "@mui/icons-material/Person";
-import SettingsIcon from "@mui/icons-material/Settings";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const navItems = [
-  { path: "/", icon: <HomeIcon />, labelKey: "navigation.home" },
+  {
+    path: "/",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+        />
+      </svg>
+    ),
+    labelKey: "navigation.home",
+  },
   {
     path: "/exercises",
-    icon: <FitnessCenterIcon />,
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 6h16M4 12h16m-7 6h7"
+        />
+      </svg>
+    ),
     labelKey: "navigation.exercises",
   },
   {
     path: "/progress",
-    icon: <TimelineIcon />,
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        />
+      </svg>
+    ),
     labelKey: "navigation.progress",
   },
-  { path: "/profile", icon: <PersonIcon />, labelKey: "navigation.profile" },
+  {
+    path: "/profile",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    ),
+    labelKey: "navigation.profile",
+  },
   {
     path: "/settings",
-    icon: <SettingsIcon />,
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+        />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    ),
     labelKey: "navigation.settings",
   },
 ];
@@ -38,103 +115,56 @@ const AppBottomNavigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const [value, setValue] = useState(-1);
-  const theme = useTheme();
+  const [activeIndex, setActiveIndex] = useState(-1);
 
-  // Update the value when location changes
+  // Update the active index when location changes
   useEffect(() => {
     const currentIndex = navItems.findIndex(
       (item) => item.path === location.pathname
     );
-    setValue(currentIndex >= 0 ? currentIndex : 0);
+    setActiveIndex(currentIndex >= 0 ? currentIndex : 0);
   }, [location.pathname]);
 
-  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+  const handleNavClick = (path: string, index: number) => {
     // Only navigate if it's a different page to avoid unnecessary rerenders
-    if (navItems[newValue].path !== location.pathname) {
-      navigate(navItems[newValue].path);
+    if (path !== location.pathname) {
+      navigate(path);
     }
+    setActiveIndex(index);
   };
 
-  // Fixed height to ensure consistency across all pages
-  const NAVBAR_HEIGHT = 56;
-
   return (
-    <Paper
-      sx={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        height: NAVBAR_HEIGHT,
-        boxShadow: 3,
-        // Fix for dark mode border
-        borderTop: "none",
-        // Replace with background color based on theme mode
-        backgroundColor: theme.palette.background.paper,
-        transition: "all 0.3s ease-in-out",
-      }}
-      elevation={3}
-    >
-      <BottomNavigation
-        showLabels
-        value={value}
-        onChange={handleChange}
-        sx={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: "transparent", // Use transparent to avoid black line
-          "& .MuiBottomNavigationAction-root": {
-            minWidth: 0,
-            maxWidth: "100%",
-            padding: "6px 0",
-            flex: "1 1 20%", // Divide evenly among 5 items
-            transition: "transform 0.2s ease, color 0.3s ease",
-            "&:hover": {
-              transform: "translateY(-2px)",
-            },
-          },
-          "& .MuiBottomNavigationAction-label": {
-            fontSize: "0.65rem",
-            fontWeight: "400",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            transition: "font-size 0.2s ease, font-weight 0.2s ease",
-            "&.Mui-selected": {
-              fontSize: "0.75rem",
-              fontWeight: "500",
-            },
-          },
-          "& .MuiBottomNavigationAction-label.Mui-selected": {
-            transform: "none",
-          },
-          "& .MuiSvgIcon-root": {
-            width: "1.5rem",
-            height: "1.5rem",
-            transition: "transform 0.3s ease, color 0.3s ease",
-          },
-        }}
-      >
+    <div className="fixed bottom-0 left-0 right-0 z-50 h-14 bg-paper shadow-md transition-all duration-300 ease-in-out">
+      <div className="flex h-full w-full items-center justify-around">
         {navItems.map((item, index) => (
-          <BottomNavigationAction
+          <button
             key={index}
-            label={t(item.labelKey)}
-            icon={item.icon}
-            sx={{
-              "&.Mui-selected": {
-                color: "primary.main",
-                "& .MuiSvgIcon-root": {
-                  transform: "scale(1.2)",
-                  color: "primary.main",
-                },
-              },
-            }}
-          />
+            onClick={() => handleNavClick(item.path, index)}
+            className={`flex h-full w-full flex-col items-center justify-center px-1 transition-all duration-300 ease-in-out
+              ${
+                index === activeIndex ? "text-tg-button" : "text-text-secondary"
+              }
+              focus:outline-none
+            `}
+          >
+            <div
+              className={`transition-transform duration-300 ${
+                index === activeIndex ? "scale-110" : ""
+              }`}
+            >
+              {item.icon}
+            </div>
+            <span
+              className={`mt-0.5 text-xs transition-all duration-300 ${
+                index === activeIndex ? "font-medium" : "font-normal"
+              }`}
+            >
+              {t(item.labelKey)}
+            </span>
+          </button>
         ))}
-      </BottomNavigation>
-    </Paper>
+      </div>
+    </div>
   );
 };
 

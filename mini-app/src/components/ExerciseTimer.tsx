@@ -1,11 +1,4 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Typography,
-  CircularProgress,
-  Stack,
-} from "@mui/material";
 
 interface ExerciseTimerProps {
   initialTime: number;
@@ -66,38 +59,50 @@ const ExerciseTimer = ({ initialTime, onComplete }: ExerciseTimerProps) => {
   };
 
   return (
-    <Box sx={{ textAlign: "center", p: 2 }}>
-      <Box sx={{ position: "relative", display: "inline-flex", mb: 2 }}>
-        <CircularProgress
-          variant="determinate"
-          value={progress}
-          size={120}
-          thickness={4}
-          sx={{ color: isActive ? "success.main" : "primary.main" }}
-        />
-        <Box
-          sx={{
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-            position: "absolute",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography variant="h4" component="div" color="text.primary">
-            {formatTime(timeLeft)}
-          </Typography>
-        </Box>
-      </Box>
+    <div className="p-4 text-center">
+      <div className="relative mb-4 inline-flex">
+        <div className="relative h-32 w-32">
+          <svg
+            className="h-full w-full -rotate-90 transform"
+            viewBox="0 0 100 100"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              stroke="rgba(200, 200, 200, 0.2)"
+              strokeWidth="8"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              fill="none"
+              stroke={isActive ? "#4CAF50" : "#2481cc"}
+              strokeWidth="8"
+              strokeDasharray="283"
+              strokeDashoffset={283 - (283 * progress) / 100}
+              className="transition-all duration-300 ease-in-out"
+            />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-2xl font-semibold">
+              {formatTime(timeLeft)}
+            </span>
+          </div>
+        </div>
+      </div>
 
-      <Stack direction="row" spacing={2} justifyContent="center">
+      <div className="flex justify-center space-x-4">
         {!isActive ? (
-          <Button
-            variant="contained"
-            color="primary"
+          <button
+            className={`rounded px-4 py-2 font-medium text-white transition-all duration-300 ease-in-out
+              ${
+                timeLeft === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-tg-button hover:bg-opacity-90 hover:-translate-y-0.5"
+              }`}
             onClick={startTimer}
             disabled={timeLeft === 0}
           >
@@ -106,23 +111,30 @@ const ExerciseTimer = ({ initialTime, onComplete }: ExerciseTimerProps) => {
               : timeLeft === initialTime
               ? "Start"
               : "Resume"}
-          </Button>
+          </button>
         ) : (
-          <Button variant="outlined" color="primary" onClick={pauseTimer}>
+          <button
+            className="rounded border border-tg-button px-4 py-2 font-medium text-tg-button transition-all duration-300 ease-in-out hover:bg-tg-button hover:bg-opacity-10 hover:-translate-y-0.5"
+            onClick={pauseTimer}
+          >
             Pause
-          </Button>
+          </button>
         )}
 
-        <Button
-          variant="outlined"
-          color="secondary"
+        <button
+          className={`rounded border border-accent px-4 py-2 font-medium text-accent transition-all duration-300 ease-in-out
+            ${
+              timeLeft === initialTime
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-accent hover:bg-opacity-10 hover:-translate-y-0.5"
+            }`}
           onClick={resetTimer}
           disabled={timeLeft === initialTime}
         >
           Reset
-        </Button>
-      </Stack>
-    </Box>
+        </button>
+      </div>
+    </div>
   );
 };
 

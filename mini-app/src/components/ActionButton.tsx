@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import { Button, ButtonProps, CircularProgress } from "@mui/material";
+import React, { useState, ButtonHTMLAttributes } from "react";
 
-interface ActionButtonProps extends ButtonProps {
+interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
   loading?: boolean;
   animated?: boolean;
+  variant?: "contained" | "outlined" | "text";
+  color?: "primary" | "secondary" | "success" | "error" | "warning" | "info";
+  fullWidth?: boolean;
+  size?: "small" | "medium" | "large";
 }
 
 /**
@@ -17,10 +20,10 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   color = "primary",
   fullWidth = false,
   size = "medium",
-  sx = {},
   disabled = false,
   loading = false,
   animated = true,
+  className = "",
   ...props
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -37,79 +40,59 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const handleMouseUp = () =>
     animated && !disabled && !loading && setIsPressed(false);
 
+  const getVariantClasses = () => {
+    switch (variant) {
+      case "contained":
+        return `bg-${
+          color === "primary" ? "tg-button" : color
+        } text-white shadow hover:shadow-md`;
+      case "outlined":
+        return `border border-${
+          color === "primary" ? "tg-button" : color
+        } text-${color === "primary" ? "tg-button" : color}`;
+      case "text":
+        return `text-${color === "primary" ? "tg-button" : color}`;
+      default:
+        return "";
+    }
+  };
+
+  const getSizeClasses = () => {
+    switch (size) {
+      case "small":
+        return "py-1 px-3 text-sm";
+      case "large":
+        return "py-3 px-6 text-lg";
+      default:
+        return "py-2 px-4";
+    }
+  };
+
   return (
-    <Button
-      variant={variant}
-      color={color}
-      fullWidth={fullWidth}
-      size={size}
+    <button
       disabled={disabled || loading}
-      sx={{
-        mt: 2,
-        position: "relative",
-        overflow: "hidden",
-        transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",
-        transform: isPressed
-          ? "scale(0.97)"
-          : isHovered
-          ? "translateY(-2px)"
-          : "translateY(0)",
-        boxShadow:
-          variant === "contained" && isHovered && !disabled
-            ? "0 6px 12px rgba(0, 0, 0, 0.15)"
-            : undefined,
-        "&::after":
-          animated && variant === "contained"
-            ? {
-                content: '""',
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                background:
-                  "linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%)",
-                transform: "translateX(-100%)",
-                animation: isHovered ? "ripple 1.5s infinite" : "none",
-                "@keyframes ripple": {
-                  "0%": {
-                    transform: "translateX(-100%)",
-                  },
-                  "100%": {
-                    transform: "translateX(100%)",
-                  },
-                },
-                pointerEvents: "none",
-              }
-            : {},
-        ...sx,
-      }}
+      className={`
+        mt-4 rounded font-medium relative overflow-hidden transition-all duration-300 ease-in-out
+        ${fullWidth ? "w-full" : ""}
+        ${getVariantClasses()}
+        ${getSizeClasses()}
+        ${isPressed ? "scale-[0.97]" : ""}
+        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+        ${className}
+      `}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       {...props}
     >
-      {loading ? (
-        <CircularProgress
-          size={24}
-          color="inherit"
-          sx={{
-            position: "absolute",
-            animation: "spin 1s infinite linear",
-            "@keyframes spin": {
-              "0%": {
-                transform: "rotate(0deg)",
-              },
-              "100%": {
-                transform: "rotate(360deg)",
-              },
-            },
-          }}
-        />
-      ) : null}
-      <span style={{ visibility: loading ? "hidden" : "visible" }}>{text}</span>
-    </Button>
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
+        </div>
+      )}
+      <span className={loading ? "invisible" : "visible"}>{text}</span>
+    </button>
   );
 };
 

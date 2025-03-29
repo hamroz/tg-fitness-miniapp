@@ -29,7 +29,8 @@ const ProgressPage = () => {
     <PageLayout>
       <SectionHeading
         title={t("navigation.progress")}
-        subtitle={t("home.recentWorkouts")}
+        // subtitle={t("home.recentWorkouts")}
+        align="center"
       />
 
       <WorkoutCalendar />
